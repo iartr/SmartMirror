@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Умное зеркало</string>
+
+    <string name="main_accessibility_account_button">Открыть аккаунт</string>
+</resources>
