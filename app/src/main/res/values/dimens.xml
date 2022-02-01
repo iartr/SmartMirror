@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="button_corner_radius">4dp</dimen>
+    <dimen name="button_corner_big_radius">8dp</dimen>
+    <dimen name="button_corner_radius_16dp">16dp</dimen>
+
+    <dimen name="button_padding_bottom">7.5dp</dimen>
+    <dimen name="button_padding_left">16dp</dimen>
+    <dimen name="button_padding_right">16dp</dimen>
+    <dimen name="button_padding_top">6.5dp</dimen>
+</resources>

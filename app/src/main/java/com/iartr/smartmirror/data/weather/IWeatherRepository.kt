@@ -1,11 +1,8 @@
-package com.iartr.smartmirror.data
+package com.iartr.smartmirror.data.weather
 
-data class Weather(
-    val time: Long,
-    val temperature: Int,
-    val `осадки`: Any
-)
+import io.reactivex.rxjava3.core.Single
 
 interface IWeatherRepository {
-    fun getWeather(day: Any): List<Weather>
+    fun getCurrentWeather(): Single<Weather>
+    fun getCurrentWeatherByCoord(lat: Double, lon: Double): Single<Weather>
 }

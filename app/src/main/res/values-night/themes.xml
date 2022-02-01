@@ -11,6 +11,11 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+
         <!-- Customize your theme here. -->
+        <item name="content_placeholder_text">@color/gray_400</item>
+        <item name="background_highlighted">@color/while_alpha8</item>
+        <item name="button_tertiary_foreground">@color/teal_200</item>
+        <item name="button_tertiary_foreground_disabled">@color/teal_200_40</item>
     </style>
 </resources>
