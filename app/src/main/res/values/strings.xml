@@ -2,8 +2,10 @@
     <string name="app_name">Умное зеркало</string>
 
     <string name="retry">Повторить</string>
+    <string name="common_network_error">Ошибка загрузки. Проверьте подключение к сети и повторите попытку.</string>
 
     <string name="main_accessibility_account_button">Открыть аккаунт</string>
 
-    <string name="common_network_error">Ошибка загрузки. Проверьте подключение к сети и повторите попытку.</string>
+    <string name="main_currency_usd">1 USD = %f руб.</string>
+    <string name="main_currency_eur">1 EUR = %f руб.</string>
 </resources>

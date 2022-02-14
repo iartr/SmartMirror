@@ -1,5 +1,7 @@
 package com.iartr.smartmirror.data.currency
 
+import io.reactivex.rxjava3.core.Single
+
 interface ICurrencyRepository {
-    fun getCurrencyList(currencies: List<CurrencyType>): List<Currency>
+    fun getCurrencyExchangeRub(): Single<ExchangeRates>
 }

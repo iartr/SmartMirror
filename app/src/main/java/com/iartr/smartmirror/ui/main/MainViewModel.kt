@@ -2,29 +2,46 @@ package com.iartr.smartmirror.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.iartr.smartmirror.data.weather.WeatherRepository
+import com.iartr.smartmirror.data.currency.ExchangeRates
+import com.iartr.smartmirror.data.currency.ICurrencyRepository
+import com.iartr.smartmirror.data.weather.IWeatherRepository
 import com.iartr.smartmirror.ui.base.BaseViewModel
 import com.iartr.smartmirror.utils.subscribeSuccess
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 class MainViewModel(
-    private val weatherRepository: WeatherRepository
+    private val weatherRepository: IWeatherRepository,
+    private val currencyRepository: ICurrencyRepository
 ) : BaseViewModel() {
-    private val stateMutable = BehaviorSubject.createDefault<WeatherState>(WeatherState.Loading)
-    val state: Observable<WeatherState> = stateMutable.distinctUntilChanged()
+    private val weatherStateMutable = BehaviorSubject.createDefault<WeatherState>(WeatherState.Loading)
+    val weatherState: Observable<WeatherState> = weatherStateMutable.distinctUntilChanged()
+
+    private val currencyStateMutable = BehaviorSubject.createDefault<CurrencyState>(CurrencyState.Loading)
+    val currencyState: Observable<CurrencyState> = currencyStateMutable.distinctUntilChanged()
 
     init {
-        getWeather()
+        loadWeather()
+        loadCurrency()
     }
 
-    fun getWeather() {
+    fun loadWeather() {
         weatherRepository.getCurrentWeather()
-            .doOnSubscribe { stateMutable.onNext(WeatherState.Loading) }
-            .doOnError { stateMutable.onNext(WeatherState.Error) }
+            .doOnSubscribe { weatherStateMutable.onNext(WeatherState.Loading) }
+            .doOnError { weatherStateMutable.onNext(WeatherState.Error) }
             .subscribeSuccess {
                 val temp = it.weatherDescriptions.first().icon.toString()
-                stateMutable.onNext(WeatherState.Success(temp))
+                weatherStateMutable.onNext(WeatherState.Success(temp))
+            }
+            .addTo(disposables)
+    }
+
+    fun loadCurrency() {
+        currencyRepository.getCurrencyExchangeRub()
+            .doOnSubscribe { currencyStateMutable.onNext(CurrencyState.Loading) }
+            .doOnError { currencyStateMutable.onNext(CurrencyState.Error) }
+            .subscribeSuccess {
+                currencyStateMutable.onNext(CurrencyState.Success(it))
             }
             .addTo(disposables)
     }
@@ -35,11 +52,18 @@ class MainViewModel(
         object Error : WeatherState
     }
 
+    sealed interface CurrencyState {
+        data class Success(val exchangeRates: ExchangeRates) : CurrencyState
+        object Loading : CurrencyState
+        object Error : CurrencyState
+    }
+
     class Factory(
-        private val weatherRepository: WeatherRepository
+        private val weatherRepository: IWeatherRepository,
+        private val currencyRepository: ICurrencyRepository
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return MainViewModel(weatherRepository) as T
+            return MainViewModel(weatherRepository, currencyRepository) as T
         }
     }
 }
