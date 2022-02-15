@@ -101,8 +101,39 @@
 
     </FrameLayout>
 
-    <!--  articles container  -->
+    <FrameLayout
+        android:id="@+id/main_articles_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/main_currency_container">
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/main_articles_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:itemCount="2"
+            tools:listitem="@layout/article_item" />
+
+        <ProgressBar
+            android:id="@+id/main_articles_container_loader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <com.iartr.smartmirror.utils.RetryingErrorView
+            android:id="@+id/main_articles_container_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:visibility="gone" />
+
+    </FrameLayout>
     <!--  ADS container  -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

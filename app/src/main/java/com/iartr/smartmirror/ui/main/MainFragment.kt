@@ -8,7 +8,10 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.RecyclerView
 import com.iartr.smartmirror.R
+import com.iartr.smartmirror.data.articles.ArticlesRepository
+import com.iartr.smartmirror.data.articles.newsApi
 import com.iartr.smartmirror.data.coord.CoordRepository
 import com.iartr.smartmirror.data.coord.coordApi
 import com.iartr.smartmirror.data.currency.CurrencyRepository
@@ -16,6 +19,7 @@ import com.iartr.smartmirror.data.currency.currencyApi
 import com.iartr.smartmirror.data.weather.WeatherRepository
 import com.iartr.smartmirror.data.weather.weatherApi
 import com.iartr.smartmirror.ui.base.BaseFragment
+import com.iartr.smartmirror.ui.main.articles.ArticlesAdapter
 import com.iartr.smartmirror.utils.RetryingErrorView
 
 class MainFragment : BaseFragment(R.layout.fragment_main) {
@@ -31,6 +35,11 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
     private lateinit var currencyLoader: ProgressBar
     private lateinit var currencyError: RetryingErrorView
 
+    private lateinit var articlesList: RecyclerView
+    private lateinit var articlesLoader: ProgressBar
+    private lateinit var articlesError: RetryingErrorView
+    private val articlesAdapter: ArticlesAdapter by lazy { ArticlesAdapter() }
+
     private val viewModel: MainViewModel by viewModels(
         factoryProducer = {
             MainViewModel.Factory(
@@ -38,7 +47,8 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
                     api = weatherApi,
                     coordRepository = CoordRepository(coordApi = coordApi)
                 ),
-                currencyRepository = CurrencyRepository(api = currencyApi)
+                currencyRepository = CurrencyRepository(api = currencyApi),
+                articlesRepository = ArticlesRepository(api = newsApi)
             )
         }
     )
@@ -57,8 +67,34 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         currencyLoader = view.findViewById(R.id.main_currency_container_loader)
         currencyError = view.findViewById(R.id.main_currency_container_error)
 
+        articlesList = view.findViewById(R.id.main_articles_list)
+        articlesLoader = view.findViewById(R.id.main_articles_container_loader)
+        articlesError = view.findViewById(R.id.main_articles_container_error)
+        articlesList.adapter = articlesAdapter
+
         viewModel.weatherState.subscribeWithFragment(::applyWeatherState)
         viewModel.currencyState.subscribeWithFragment(::applyCurrencyState)
+        viewModel.articlesState.subscribeWithFragment { state ->
+            when (state) {
+                is MainViewModel.ArticlesState.Error -> {
+                    articlesList.isVisible = false
+                    articlesLoader.isVisible = false
+                    articlesError.show(retryAction = { viewModel.loadArticles() })
+                }
+                is MainViewModel.ArticlesState.Loading -> {
+                    articlesList.isVisible = false
+                    articlesLoader.isVisible = true
+                    articlesError.hide()
+                }
+                is MainViewModel.ArticlesState.Success -> {
+                    articlesList.isVisible = true
+                    articlesLoader.isVisible = false
+                    articlesError.hide()
+
+                    articlesAdapter.submitList(state.articles)
+                }
+            }
+        }
     }
 
     private fun applyWeatherState(weatherState: MainViewModel.WeatherState) =

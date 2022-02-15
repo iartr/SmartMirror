@@ -1,7 +1,7 @@
 package com.iartr.smartmirror.data.articles
 
-interface IArticlesRepository {
-    fun getArticlePreviews(day: Any, offset: Int, limit: Int): List<Any>
+import io.reactivex.rxjava3.core.Single
 
-    fun getFullArticle(articleId: Int): List<Any>
+interface IArticlesRepository {
+    fun getLatest(): Single<List<Article>>
 }

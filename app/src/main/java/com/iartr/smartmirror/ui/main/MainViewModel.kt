@@ -2,6 +2,8 @@ package com.iartr.smartmirror.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.iartr.smartmirror.data.articles.Article
+import com.iartr.smartmirror.data.articles.IArticlesRepository
 import com.iartr.smartmirror.data.currency.ExchangeRates
 import com.iartr.smartmirror.data.currency.ICurrencyRepository
 import com.iartr.smartmirror.data.weather.IWeatherRepository
@@ -12,7 +14,8 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 class MainViewModel(
     private val weatherRepository: IWeatherRepository,
-    private val currencyRepository: ICurrencyRepository
+    private val currencyRepository: ICurrencyRepository,
+    private val articlesRepository: IArticlesRepository
 ) : BaseViewModel() {
     private val weatherStateMutable = BehaviorSubject.createDefault<WeatherState>(WeatherState.Loading)
     val weatherState: Observable<WeatherState> = weatherStateMutable.distinctUntilChanged()
@@ -20,9 +23,13 @@ class MainViewModel(
     private val currencyStateMutable = BehaviorSubject.createDefault<CurrencyState>(CurrencyState.Loading)
     val currencyState: Observable<CurrencyState> = currencyStateMutable.distinctUntilChanged()
 
+    private val articlesStateMutable = BehaviorSubject.createDefault<ArticlesState>(ArticlesState.Loading)
+    val articlesState: Observable<ArticlesState> = articlesStateMutable.distinctUntilChanged()
+
     init {
         loadWeather()
         loadCurrency()
+        loadArticles()
     }
 
     fun loadWeather() {
@@ -46,6 +53,14 @@ class MainViewModel(
             .addTo(disposables)
     }
 
+    fun loadArticles() {
+        articlesRepository.getLatest()
+            .doOnSubscribe { articlesStateMutable.onNext(ArticlesState.Loading) }
+            .doOnError { articlesStateMutable.onNext(ArticlesState.Error) }
+            .subscribeSuccess { articlesStateMutable.onNext(ArticlesState.Success(it)) }
+            .addTo(disposables)
+    }
+
     sealed interface WeatherState {
         data class Success(val temperature: String) : WeatherState
         object Loading : WeatherState
@@ -58,12 +73,19 @@ class MainViewModel(
         object Error : CurrencyState
     }
 
+    sealed interface ArticlesState {
+        data class Success(val articles: List<Article>) : ArticlesState
+        object Loading : ArticlesState
+        object Error : ArticlesState
+    }
+
     class Factory(
         private val weatherRepository: IWeatherRepository,
-        private val currencyRepository: ICurrencyRepository
+        private val currencyRepository: ICurrencyRepository,
+        private val articlesRepository: IArticlesRepository,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return MainViewModel(weatherRepository, currencyRepository) as T
+            return MainViewModel(weatherRepository, currencyRepository, articlesRepository) as T
         }
     }
 }
