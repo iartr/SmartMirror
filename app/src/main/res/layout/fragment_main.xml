@@ -134,6 +134,16 @@
             android:visibility="gone" />
 
     </FrameLayout>
-    <!--  ADS container  -->
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/main_ad_view"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:adSize="BANNER"
+        app:adUnitId="ca-app-pub-3940256099942544/6300978111"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,6 +2,9 @@ package com.iartr.smartmirror.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.iartr.smartmirror.BuildConfig
 import com.iartr.smartmirror.data.articles.Article
 import com.iartr.smartmirror.data.articles.IArticlesRepository
 import com.iartr.smartmirror.data.currency.ExchangeRates
@@ -25,6 +28,8 @@ class MainViewModel(
 
     private val articlesStateMutable = BehaviorSubject.createDefault<ArticlesState>(ArticlesState.Loading)
     val articlesState: Observable<ArticlesState> = articlesStateMutable.distinctUntilChanged()
+
+    val adListener: AdListener = object : AdListener() { }
 
     init {
         loadWeather()
@@ -59,6 +64,18 @@ class MainViewModel(
             .doOnError { articlesStateMutable.onNext(ArticlesState.Error) }
             .subscribeSuccess { articlesStateMutable.onNext(ArticlesState.Success(it)) }
             .addTo(disposables)
+    }
+
+    fun getAdRequest(): AdRequest {
+        return AdRequest.Builder().build()
+    }
+
+    fun getBannerUnitId(): String {
+        return if (BuildConfig.DEBUG) {
+            "ca-app-pub-3940256099942544/6300978111"
+        } else {
+            "ca-app-pub-7136917781275978/7644983313"
+        }
     }
 
     sealed interface WeatherState {

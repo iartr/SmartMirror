@@ -9,6 +9,8 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.iartr.smartmirror.R
 import com.iartr.smartmirror.data.articles.ArticlesRepository
 import com.iartr.smartmirror.data.articles.newsApi
@@ -39,6 +41,8 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
     private lateinit var articlesLoader: ProgressBar
     private lateinit var articlesError: RetryingErrorView
     private val articlesAdapter: ArticlesAdapter by lazy { ArticlesAdapter() }
+
+    private lateinit var adView: AdView
 
     private val viewModel: MainViewModel by viewModels(
         factoryProducer = {
@@ -72,29 +76,25 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         articlesError = view.findViewById(R.id.main_articles_container_error)
         articlesList.adapter = articlesAdapter
 
+        adView = view.findViewById<AdView>(R.id.main_ad_view).apply {
+            resume()
+            loadAd(viewModel.getAdRequest())
+            adListener = viewModel.adListener
+        }
+
         viewModel.weatherState.subscribeWithFragment(::applyWeatherState)
         viewModel.currencyState.subscribeWithFragment(::applyCurrencyState)
-        viewModel.articlesState.subscribeWithFragment { state ->
-            when (state) {
-                is MainViewModel.ArticlesState.Error -> {
-                    articlesList.isVisible = false
-                    articlesLoader.isVisible = false
-                    articlesError.show(retryAction = { viewModel.loadArticles() })
-                }
-                is MainViewModel.ArticlesState.Loading -> {
-                    articlesList.isVisible = false
-                    articlesLoader.isVisible = true
-                    articlesError.hide()
-                }
-                is MainViewModel.ArticlesState.Success -> {
-                    articlesList.isVisible = true
-                    articlesLoader.isVisible = false
-                    articlesError.hide()
+        viewModel.articlesState.subscribeWithFragment(::applyArticlesState)
+    }
 
-                    articlesAdapter.submitList(state.articles)
-                }
-            }
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        adView.pause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        adView.destroy()
     }
 
     private fun applyWeatherState(weatherState: MainViewModel.WeatherState) =
@@ -136,6 +136,28 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
                 currencyList.isVisible = false
                 currencyLoader.isVisible = false
                 currencyError.show(retryAction = { viewModel.loadCurrency() })
+            }
+        }
+    }
+
+    private fun applyArticlesState(articlesState: MainViewModel.ArticlesState) {
+        when (articlesState) {
+            is MainViewModel.ArticlesState.Error -> {
+                articlesList.isVisible = false
+                articlesLoader.isVisible = false
+                articlesError.show(retryAction = { viewModel.loadArticles() })
+            }
+            is MainViewModel.ArticlesState.Loading -> {
+                articlesList.isVisible = false
+                articlesLoader.isVisible = true
+                articlesError.hide()
+            }
+            is MainViewModel.ArticlesState.Success -> {
+                articlesList.isVisible = true
+                articlesLoader.isVisible = false
+                articlesError.hide()
+
+                articlesAdapter.submitList(articlesState.articles)
             }
         }
     }

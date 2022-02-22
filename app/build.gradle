@@ -63,6 +63,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version")
     implementation("androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycle_version")
 
+    // Google ADs
+    implementation 'com.google.android.gms:play-services-ads:20.5.0'
+
     /**
      * RxJava:
      * RxKotlin:
