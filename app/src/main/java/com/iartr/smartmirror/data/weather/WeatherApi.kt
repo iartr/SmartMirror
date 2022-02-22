@@ -1,5 +1,6 @@
 package com.iartr.smartmirror.data.weather
 
+import com.iartr.smartmirror.data.core.okHttpClient
 import io.reactivex.rxjava3.core.Single
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
@@ -9,13 +10,14 @@ import retrofit2.http.Query
 
 private val retrofit = Retrofit.Builder()
     .baseUrl("https://api.openweathermap.org/data/2.5/")
+    .client(okHttpClient)
     .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
     .addConverterFactory(GsonConverterFactory.create())
     .build()
 val weatherApi: WeatherApi = retrofit.create(WeatherApi::class.java)
 
 interface WeatherApi {
-    @GET("weather?appid=$APP_ID")
+    @GET("weather?appid=$APP_ID&units=metric")
     fun getCurrentWeatherByCoord(@Query("lat") lat: Double, @Query("lon") lon: Double): Single<Weather>
 
     private companion object {

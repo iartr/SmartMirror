@@ -103,7 +103,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
                 weatherLoading.isVisible = false
                 weatherError.hide()
                 weatherData.isVisible = true
-                weatherData.text = weatherState.temperature
+                weatherData.text = "${weatherState.icon}\n${weatherState.temperature}℃"
             }
             is MainViewModel.WeatherState.Error -> {
                 weatherLoading.isVisible = false

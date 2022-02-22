@@ -42,8 +42,9 @@ class MainViewModel(
             .doOnSubscribe { weatherStateMutable.onNext(WeatherState.Loading) }
             .doOnError { weatherStateMutable.onNext(WeatherState.Error) }
             .subscribeSuccess {
-                val temp = it.weatherDescriptions.first().icon.toString()
-                weatherStateMutable.onNext(WeatherState.Success(temp))
+                val icon = it.weatherDescriptions.first().icon.toString()
+                val temp = it.temperature.temp.toInt().toString()
+                weatherStateMutable.onNext(WeatherState.Success(temp, icon))
             }
             .addTo(disposables)
     }
@@ -79,7 +80,7 @@ class MainViewModel(
     }
 
     sealed interface WeatherState {
-        data class Success(val temperature: String) : WeatherState
+        data class Success(val temperature: String, val icon: String) : WeatherState
         object Loading : WeatherState
         object Error : WeatherState
     }
