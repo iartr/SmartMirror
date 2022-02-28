@@ -42,7 +42,8 @@ class MainViewModel(
             .doOnSubscribe { weatherStateMutable.onNext(WeatherState.Loading) }
             .doOnError { weatherStateMutable.onNext(WeatherState.Error) }
             .subscribeSuccess {
-                val icon = it.weatherDescriptions.first().icon.toString()
+//                val icon = it.weatherDescriptions.first().icon.toString()
+                val icon = it.weatherDescriptions.first().description
                 val temp = it.temperature.temp.toInt().toString()
                 weatherStateMutable.onNext(WeatherState.Success(temp, icon))
             }

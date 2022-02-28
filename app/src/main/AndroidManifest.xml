@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name=".SmartMirrorApplication"
@@ -24,6 +25,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.SmartMirror.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
