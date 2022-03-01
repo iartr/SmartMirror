@@ -8,4 +8,8 @@
 
     <string name="main_currency_usd">1 USD = %.2f руб.</string>
     <string name="main_currency_eur">1 EUR = %.2f руб.</string>
+    <string name="title_activity_preference">PreferenceActivity</string>
+
+    <string name="preference_header">Дебаг-настройки</string>
+    <string name="preference_camera">Камера включена?</string>
 </resources>

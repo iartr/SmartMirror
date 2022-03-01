@@ -2,6 +2,7 @@ package com.iartr.smartmirror.ui.main
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.hardware.display.DisplayManager
 import android.os.Bundle
@@ -9,10 +10,7 @@ import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -31,6 +29,8 @@ import com.iartr.smartmirror.data.currency.CurrencyRepository
 import com.iartr.smartmirror.data.currency.currencyApi
 import com.iartr.smartmirror.data.weather.WeatherRepository
 import com.iartr.smartmirror.data.weather.weatherApi
+import com.iartr.smartmirror.toggles.CameraFeatureToggle
+import com.iartr.smartmirror.ui.PreferenceActivity
 import com.iartr.smartmirror.ui.base.BaseFragment
 import com.iartr.smartmirror.ui.main.articles.ArticlesAdapter
 import com.iartr.smartmirror.utils.RetryingErrorView
@@ -100,7 +100,8 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
                     coordRepository = CoordRepository(coordApi = coordApi)
                 ),
                 currencyRepository = CurrencyRepository(api = currencyApi),
-                articlesRepository = ArticlesRepository(api = newsApi)
+                articlesRepository = ArticlesRepository(api = newsApi),
+                cameraFeatureToggle = CameraFeatureToggle(requireContext())
             )
         }
     )
@@ -117,7 +118,13 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        accountButton = view.findViewById(R.id.main_account_button)
+        accountButton = view.findViewById<ImageView>(R.id.main_account_button).apply {
+            setOnLongClickListener {
+                viewModel.onAccountButtonLongClickListener()
+                startActivity(Intent(context, PreferenceActivity::class.java)) // TODO: router
+                true
+            }
+        }
         weatherContainer = view.findViewById(R.id.main_weather_container)
         weatherData = view.findViewById(R.id.main_weather_container_data)
         weatherLoading = view.findViewById(R.id.main_weather_container_loader)
@@ -150,6 +157,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         viewModel.weatherState.subscribeWithFragment(::applyWeatherState)
         viewModel.currencyState.subscribeWithFragment(::applyCurrencyState)
         viewModel.articlesState.subscribeWithFragment(::applyArticlesState)
+        viewModel.cameraState.subscribeWithFragment(::applyCameraState)
     }
 
     override fun onDestroyView() {
@@ -177,25 +185,25 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
                     ContextCompat.getMainExecutor(requireContext())
                 )
             }
-            else -> requestCamera.launch(Manifest.permission.CAMERA)
+
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ->
+                requestCamera.launch(Manifest.permission.CAMERA)
+
+            shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) ->
+                requestCamera.launch(Manifest.permission.CAMERA)
         }
     }
 
     private fun bindCameraUseCases() {
         val metrics = DisplayMetrics().also { cameraView.display.getRealMetrics(it) }
-
         val screenAspectRatio = aspectRatio(metrics.widthPixels, metrics.heightPixels)
-
         val rotation = cameraView.display.rotation
         val cameraProvider = cameraProvider ?: throw IllegalStateException("Camera initialization failed.")
-
         val cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
-
         previewUseCase = Preview.Builder()
             .setTargetAspectRatio(screenAspectRatio)
             .setTargetRotation(rotation)
             .build()
-
         val analyzer = object : ImageAnalysis.Analyzer {
             override fun analyze(image: ImageProxy) {
                 //
@@ -212,7 +220,6 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
                     analyzer
                 )
             }
-
         cameraProvider.unbindAll()
         try {
             camera = cameraProvider.bindToLifecycle(this, cameraSelector, previewUseCase, imageAnalyzer)
@@ -296,7 +303,15 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         }
     }
 
-    companion object {
+    private fun applyCameraState(cameraState: MainViewModel.CameraState) {
+        when (cameraState) {
+            MainViewModel.CameraState.Visible -> cameraView.isVisible = true
+            MainViewModel.CameraState.Hide -> cameraView.isVisible = false
+            MainViewModel.CameraState.NotAvailable -> cameraView.isVisible = false
+        }
+    }
+
+    private companion object {
         private const val RATIO_4_3_VALUE = 4.0 / 3.0
         private const val RATIO_16_9_VALUE = 16.0 / 9.0
     }

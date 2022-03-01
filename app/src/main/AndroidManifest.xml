@@ -15,7 +15,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartMirror">
-
+        <activity
+            android:name=".ui.PreferenceActivity"
+            android:exported="false"
+            android:label="@string/title_activity_preference" />
         <!-- Banner: ca-app-pub-7136917781275978/7644983313 -->
         <!-- Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713 -->
         <meta-data

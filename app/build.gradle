@@ -68,6 +68,9 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.4.0")
     // https://developer.android.com/jetpack/androidx/releases/fragment
     implementation("androidx.fragment:fragment-ktx:1.4.1")
+    // https://developer.android.com/jetpack/androidx/releases/preference
+    implementation("androidx.preference:preference-ktx:1.2.0")
+    implementation 'androidx.preference:preference:1.1.1'
 
     // Navigation component
 

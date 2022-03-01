@@ -10,6 +10,7 @@ import com.iartr.smartmirror.data.articles.IArticlesRepository
 import com.iartr.smartmirror.data.currency.ExchangeRates
 import com.iartr.smartmirror.data.currency.ICurrencyRepository
 import com.iartr.smartmirror.data.weather.IWeatherRepository
+import com.iartr.smartmirror.toggles.CameraFeatureToggle
 import com.iartr.smartmirror.ui.base.BaseViewModel
 import com.iartr.smartmirror.utils.subscribeSuccess
 import io.reactivex.rxjava3.core.Observable
@@ -18,7 +19,8 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 class MainViewModel(
     private val weatherRepository: IWeatherRepository,
     private val currencyRepository: ICurrencyRepository,
-    private val articlesRepository: IArticlesRepository
+    private val articlesRepository: IArticlesRepository,
+    private val cameraFeatureToggle: CameraFeatureToggle
 ) : BaseViewModel() {
     private val weatherStateMutable = BehaviorSubject.createDefault<WeatherState>(WeatherState.Loading)
     val weatherState: Observable<WeatherState> = weatherStateMutable.distinctUntilChanged()
@@ -29,12 +31,16 @@ class MainViewModel(
     private val articlesStateMutable = BehaviorSubject.createDefault<ArticlesState>(ArticlesState.Loading)
     val articlesState: Observable<ArticlesState> = articlesStateMutable.distinctUntilChanged()
 
+    private val cameraStateMutable = BehaviorSubject.createDefault<CameraState>(CameraState.Hide)
+    val cameraState: Observable<CameraState> = cameraStateMutable.distinctUntilChanged()
+
     val adListener: AdListener = object : AdListener() { }
 
     init {
         loadWeather()
         loadCurrency()
         loadArticles()
+        loadCameraState()
     }
 
     fun loadWeather() {
@@ -68,6 +74,11 @@ class MainViewModel(
             .addTo(disposables)
     }
 
+    fun loadCameraState() {
+        val isActive = cameraFeatureToggle.isActive()
+        cameraStateMutable.onNext(if (isActive) CameraState.Visible else CameraState.Hide)
+    }
+
     fun getAdRequest(): AdRequest {
         return AdRequest.Builder().build()
     }
@@ -78,6 +89,10 @@ class MainViewModel(
         } else {
             "ca-app-pub-7136917781275978/7644983313"
         }
+    }
+
+    fun onAccountButtonLongClickListener() {
+
     }
 
     sealed interface WeatherState {
@@ -98,13 +113,20 @@ class MainViewModel(
         object Error : ArticlesState
     }
 
+    sealed interface CameraState {
+        object Visible : CameraState
+        object NotAvailable : CameraState
+        object Hide : CameraState
+    }
+
     class Factory(
         private val weatherRepository: IWeatherRepository,
         private val currencyRepository: ICurrencyRepository,
         private val articlesRepository: IArticlesRepository,
+        private val cameraFeatureToggle: CameraFeatureToggle
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return MainViewModel(weatherRepository, currencyRepository, articlesRepository) as T
+            return MainViewModel(weatherRepository, currencyRepository, articlesRepository, cameraFeatureToggle) as T
         }
     }
 }
