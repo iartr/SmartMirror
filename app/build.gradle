@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    compileSdk 32
+    compileSdk 31
 
     defaultConfig {
         applicationId "com.iartr.smartmirror"
@@ -87,6 +87,7 @@ dependencies {
     // Firebase
     implementation platform('com.google.firebase:firebase-bom:29.1.0')
     implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-database-ktx'
     implementation 'com.google.android.gms:play-services-auth:20.1.0'
 
     /**
@@ -130,6 +131,7 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:1.0.2"
     // CameraX View class
     implementation "androidx.camera:camera-view:1.0.0-alpha32"
+    implementation 'com.google.mlkit:face-detection:16.1.5'
 
     // Test
     testImplementation 'junit:junit:4.13.2'

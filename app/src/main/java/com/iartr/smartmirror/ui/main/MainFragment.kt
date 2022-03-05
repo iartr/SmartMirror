@@ -1,9 +1,11 @@
 package com.iartr.smartmirror.ui.main
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Rect
 import android.hardware.display.DisplayManager
 import android.os.Bundle
 import android.util.DisplayMetrics
@@ -20,6 +22,13 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.AdView
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.Face
+import com.google.mlkit.vision.face.FaceContour
+import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.iartr.smartmirror.R
 import com.iartr.smartmirror.data.articles.ArticlesRepository
 import com.iartr.smartmirror.data.articles.newsApi
@@ -29,6 +38,7 @@ import com.iartr.smartmirror.data.currency.CurrencyRepository
 import com.iartr.smartmirror.data.currency.currencyApi
 import com.iartr.smartmirror.data.weather.WeatherRepository
 import com.iartr.smartmirror.data.weather.weatherApi
+import com.iartr.smartmirror.deviceid.DeviceIdProvider
 import com.iartr.smartmirror.toggles.CameraFeatureToggle
 import com.iartr.smartmirror.ui.PreferenceActivity
 import com.iartr.smartmirror.ui.base.BaseFragment
@@ -84,6 +94,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         override fun onDisplayAdded(displayId: Int) = Unit
         override fun onDisplayRemoved(displayId: Int) = Unit
 
+        @SuppressLint("UnsafeOptInUsageError")
         override fun onDisplayChanged(displayId: Int) = view?.let { view ->
             if (displayId == this@MainFragment.displayId) {
                 previewUseCase?.targetRotation = view.display.rotation
@@ -92,6 +103,9 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         } ?: Unit
     }
 
+    // TODO: to repository + RxJava. Move camera to CameraController
+    private val database = Firebase.database
+    private val facesDatabase = database.reference.child("faces")
     private val viewModel: MainViewModel by viewModels(
         factoryProducer = {
             MainViewModel.Factory(
@@ -204,22 +218,12 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
             .setTargetAspectRatio(screenAspectRatio)
             .setTargetRotation(rotation)
             .build()
-        val analyzer = object : ImageAnalysis.Analyzer {
-            override fun analyze(image: ImageProxy) {
-                //
-            }
-        }
         imageAnalyzer = ImageAnalysis.Builder()
             .setTargetAspectRatio(screenAspectRatio)
             .setTargetRotation(rotation)
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
-            .apply {
-                setAnalyzer(
-                    executor,
-                    analyzer
-                )
-            }
+            .apply { setAnalyzer(executor, faceAnalyzer()) }
         cameraProvider.unbindAll()
         try {
             camera = cameraProvider.bindToLifecycle(this, cameraSelector, previewUseCase, imageAnalyzer)
@@ -308,6 +312,115 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
             MainViewModel.CameraState.Visible -> cameraView.isVisible = true
             MainViewModel.CameraState.Hide -> cameraView.isVisible = false
             MainViewModel.CameraState.NotAvailable -> cameraView.isVisible = false
+        }
+    }
+
+    private data class FaceData(
+        val trackingId: Int,
+        val deviceId: String,
+        val timestamp: Long,
+
+        val boundLeft: Int,
+        val boundTop: Int,
+        val boundRight: Int,
+        val boundBottom: Int,
+
+        val smilingProbability: Float,
+        val leftEyeOpenProbability: Float,
+        val rightEyeOpenProbability: Float,
+    ) {
+        companion object {
+            val EMPTY = FaceData(
+                trackingId = -1,
+                deviceId = "",
+                timestamp = -1,
+                boundLeft = -1,
+                boundTop = -1,
+                boundRight = -1,
+                boundBottom = -1,
+                smilingProbability = -1f,
+                leftEyeOpenProbability = -1f,
+                rightEyeOpenProbability = -1f,
+            )
+        }
+    }
+    @SuppressLint("UnsafeOptInUsageError")
+    private fun faceAnalyzer(): ImageAnalysis.Analyzer {
+        val highAccuracyOptions = FaceDetectorOptions.Builder()
+            .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+            .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
+            .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
+            .setContourMode(FaceDetectorOptions.CONTOUR_MODE_NONE)
+            .setMinFaceSize(0.1f)
+            .enableTracking()
+            .build()
+
+        val detector = FaceDetection.getClient(highAccuracyOptions)
+
+        // Single thread executor so concurrency is not needed
+        var lastFaceData = FaceData.EMPTY
+
+        val faceJob: (Face) -> Unit = { face ->
+            val bounds: Rect = face.boundingBox
+            val rotX: Float = face.headEulerAngleX
+            val rotY: Float = face.headEulerAngleY // Head is rotated to the right rotY degrees
+            val rotZ: Float = face.headEulerAngleZ // Head is tilted sideways rotZ degrees
+
+            // if landmark was enabled: mouth, eyes, ears, cheeks, nose
+            val landmarks = face.allLandmarks
+
+            // If contour detection was enabled:
+            val leftEyeContour = face.getContour(FaceContour.LEFT_EYE)?.points
+            val upperLipBottomContour = face.getContour(FaceContour.UPPER_LIP_BOTTOM)?.points
+
+            // If classification was enabled:
+            val smilingProbability = face.smilingProbability
+            val leftEyeOpenProbability = face.leftEyeOpenProbability
+            val rightEyeOpenProbability = face.rightEyeOpenProbability
+
+            // If face tracking was enabled:
+            val trackingId = face.trackingId
+
+            android.util.Log.d("FaceAnalyzer", """
+                Face was detected!
+                face ID: $trackingId
+                bounds: $bounds
+                rotx: $rotX, roty: $rotY, rotz: $rotZ
+                landmarks: $landmarks
+                smiling: $smilingProbability
+                leftEye: $leftEyeOpenProbability
+                rightEye: $rightEyeOpenProbability
+            """.trimIndent())
+
+            if (lastFaceData.trackingId != trackingId) {
+                lastFaceData = lastFaceData.copy(
+                    trackingId = trackingId!!,
+                    deviceId = DeviceIdProvider.getDeviceId(),
+                    timestamp = System.currentTimeMillis(),
+                    boundLeft = bounds.left,
+                    boundTop = bounds.top,
+                    boundRight = bounds.right,
+                    boundBottom = bounds.bottom,
+                    smilingProbability = smilingProbability!!,
+                    leftEyeOpenProbability = leftEyeOpenProbability!!,
+                    rightEyeOpenProbability = rightEyeOpenProbability!!,
+                )
+                facesDatabase.push().setValue(lastFaceData)
+                android.util.Log.d("FaceAnalyzer", "Value was sent to database $lastFaceData")
+            }
+        }
+
+        val facesJob: (List<Face>) -> Unit = { faces -> faces.forEach { faceJob(it) } }
+
+        return ImageAnalysis.Analyzer { imageProxy: ImageProxy ->
+            val mediaImage = imageProxy.image
+            if (mediaImage != null) {
+                val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+                detector.process(image)
+                    .addOnSuccessListener { facesJob(it) }
+                    .addOnFailureListener { android.util.Log.e("FaceAnalyzer", "failure listener", it) }
+                    .addOnCompleteListener { imageProxy.close() }
+            }
         }
     }
 

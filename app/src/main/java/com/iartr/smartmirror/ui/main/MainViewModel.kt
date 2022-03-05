@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
 import com.iartr.smartmirror.BuildConfig
 import com.iartr.smartmirror.data.articles.Article
 import com.iartr.smartmirror.data.articles.IArticlesRepository
@@ -34,7 +35,17 @@ class MainViewModel(
     private val cameraStateMutable = BehaviorSubject.createDefault<CameraState>(CameraState.Hide)
     val cameraState: Observable<CameraState> = cameraStateMutable.distinctUntilChanged()
 
-    val adListener: AdListener = object : AdListener() { }
+    val adListener: AdListener = object : AdListener() {
+        override fun onAdFailedToLoad(p0: LoadAdError) {
+            super.onAdFailedToLoad(p0)
+            android.util.Log.e("ADS_TAG", "failed: $p0")
+        }
+
+        override fun onAdLoaded() {
+            super.onAdLoaded()
+            android.util.Log.e("ADS_TAG", "loaded")
+        }
+    }
 
     init {
         loadWeather()
