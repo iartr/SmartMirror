@@ -1,7 +1,10 @@
 <resources>
+    <!-- From GMS Console: 653881162314-7mfa1tift9iiksl8ob7g1n6o6qj6rllc.apps.googleusercontent.com -->
+    <!-- From Firebase generated: 666377868857-6b3mldm7i4d3ppvv5u865aufhc90suu2.apps.googleusercontent.com-->
     <string name="app_name">Умное зеркало</string>
 
     <string name="retry">Повторить</string>
+    <string name="you_was_sign_out">Вы были разлогинены</string>
     <string name="common_network_error">Ошибка загрузки. Проверьте подключение к сети и повторите попытку.</string>
 
     <string name="main_accessibility_account_button">Открыть аккаунт</string>
@@ -12,4 +15,17 @@
 
     <string name="preference_header">Дебаг-настройки</string>
     <string name="preference_camera">Камера включена?</string>
+
+    <string name="account_title">Ваш аккаунт</string>
+    <string name="account_sign_out">Выйти из аккаунта</string>
+    <string name="account_photo_content_description">Аватар</string>
+    <string name="account_uid">UID: %s</string>
+    <string name="account_display_name">Display name: %s</string>
+    <string name="account_email">Email: %s</string>
+    <string name="account_email_is_verified">Email is verified: %s</string>
+    <string name="account_metadata">Metadata: %s</string>
+    <string name="account_multifactor">Multifactor: %s</string>
+    <string name="account_phone">Phone: %s</string>
+    <string name="account_provider_id">Provider id: %s</string>
+    <string name="account_tenat_id">Tenat id: %s</string>
 </resources>

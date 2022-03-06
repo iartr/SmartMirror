@@ -1,4 +1,4 @@
-package com.iartr.smartmirror.ui
+package com.iartr.smartmirror.ui.debug
 
 import android.content.DialogInterface
 import android.os.Bundle

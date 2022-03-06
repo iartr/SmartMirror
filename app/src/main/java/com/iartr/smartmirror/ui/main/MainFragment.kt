@@ -22,6 +22,11 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.AdView
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.mlkit.vision.common.InputImage
@@ -40,7 +45,8 @@ import com.iartr.smartmirror.data.weather.WeatherRepository
 import com.iartr.smartmirror.data.weather.weatherApi
 import com.iartr.smartmirror.deviceid.DeviceIdProvider
 import com.iartr.smartmirror.toggles.CameraFeatureToggle
-import com.iartr.smartmirror.ui.PreferenceActivity
+import com.iartr.smartmirror.ui.account.AccountFragment
+import com.iartr.smartmirror.ui.debug.PreferenceActivity
 import com.iartr.smartmirror.ui.base.BaseFragment
 import com.iartr.smartmirror.ui.main.articles.ArticlesAdapter
 import com.iartr.smartmirror.utils.RetryingErrorView
@@ -120,6 +126,39 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         }
     )
 
+    // TODO: auth controller
+    private val firebaseAuth: FirebaseAuth = Firebase.auth
+    private val firebaseAuthStateListener: FirebaseAuth.AuthStateListener = object : FirebaseAuth.AuthStateListener {
+        override fun onAuthStateChanged(auth: FirebaseAuth) {
+            // Right after the listener has been registered
+            // When a user is signed in
+            // When the current user is signed out
+            // When the current user changes
+
+
+        }
+    }
+    private val googleAuthResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        GoogleSignIn.getSignedInAccountFromIntent(it.data)
+            .addOnSuccessListener(requireActivity()) { googleAccount ->
+                android.util.Log.d("GoogleAuthController", "Success: $googleAccount")
+                val googleCredentials = GoogleAuthProvider.getCredential(googleAccount.idToken, null)
+                firebaseAuth.signInWithCredential(googleCredentials)
+                    .addOnSuccessListener(requireActivity()) {
+                        it.additionalUserInfo
+                        it.credential
+                        it.user
+
+                        // TODO: router
+                        openAccount()
+                    }
+                    .addOnFailureListener(requireActivity()) { android.util.Log.e("GoogleAuthController", "Failed", it) }
+                    .addOnCompleteListener(requireActivity()) { android.util.Log.d("GoogleAuthController", "Task completed") }
+            }
+            .addOnFailureListener(requireActivity()) { android.util.Log.e("GoogleAuthController", "Failed", it) }
+            .addOnCompleteListener(requireActivity()) { android.util.Log.d("GoogleAuthController", "Task completed") }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -133,6 +172,20 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         super.onViewCreated(view, savedInstanceState)
 
         accountButton = view.findViewById<ImageView>(R.id.main_account_button).apply {
+            setOnClickListener {
+                if (firebaseAuth.currentUser != null) {
+                    openAccount()
+                    return@setOnClickListener
+                }
+                val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken("666377868857-6b3mldm7i4d3ppvv5u865aufhc90suu2.apps.googleusercontent.com")
+                    .requestEmail()
+                    .build()
+
+                val googleClient = GoogleSignIn.getClient(context, googleSignInOptions)
+                val googleIntent = googleClient.signInIntent
+                googleAuthResultLauncher.launch(googleIntent)
+            }
             setOnLongClickListener {
                 viewModel.onAccountButtonLongClickListener()
                 startActivity(Intent(context, PreferenceActivity::class.java)) // TODO: router
@@ -307,12 +360,10 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         }
     }
 
-    private fun applyCameraState(cameraState: MainViewModel.CameraState) {
-        when (cameraState) {
-            MainViewModel.CameraState.Visible -> cameraView.isVisible = true
-            MainViewModel.CameraState.Hide -> cameraView.isVisible = false
-            MainViewModel.CameraState.NotAvailable -> cameraView.isVisible = false
-        }
+    private fun applyCameraState(cameraState: MainViewModel.CameraState) = when (cameraState) {
+        MainViewModel.CameraState.Visible -> cameraView.isVisible = true
+        MainViewModel.CameraState.Hide -> cameraView.isVisible = false
+        MainViewModel.CameraState.NotAvailable -> cameraView.isVisible = false
     }
 
     private data class FaceData(
@@ -422,6 +473,14 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
                     .addOnCompleteListener { imageProxy.close() }
             }
         }
+    }
+
+    private fun openAccount() {
+        activity?.supportFragmentManager
+            ?.beginTransaction()
+            ?.addToBackStack(null)
+            ?.replace(R.id.fragment_container_view, AccountFragment.newInstance())
+            ?.commit()
     }
 
     private companion object {
