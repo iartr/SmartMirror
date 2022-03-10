@@ -29,6 +29,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceContour
@@ -44,7 +45,7 @@ import com.iartr.smartmirror.data.currency.currencyApi
 import com.iartr.smartmirror.data.weather.WeatherRepository
 import com.iartr.smartmirror.data.weather.weatherApi
 import com.iartr.smartmirror.deviceid.DeviceIdProvider
-import com.iartr.smartmirror.toggles.CameraFeatureToggle
+import com.iartr.smartmirror.toggles.*
 import com.iartr.smartmirror.ui.account.AccountFragment
 import com.iartr.smartmirror.ui.debug.PreferenceActivity
 import com.iartr.smartmirror.ui.base.BaseFragment
@@ -69,6 +70,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
     private lateinit var currencyLoader: ProgressBar
     private lateinit var currencyError: RetryingErrorView
 
+    private lateinit var articlesContainer: View
     private lateinit var articlesList: RecyclerView
     private lateinit var articlesLoader: ProgressBar
     private lateinit var articlesError: RetryingErrorView
@@ -109,6 +111,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         } ?: Unit
     }
 
+    private val remoteConfig = Firebase.remoteConfig
     // TODO: to repository + RxJava. Move camera to CameraController
     private val database = Firebase.database
     private val facesDatabase = database.reference.child("faces")
@@ -121,7 +124,12 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
                 ),
                 currencyRepository = CurrencyRepository(api = currencyApi),
                 articlesRepository = ArticlesRepository(api = newsApi),
-                cameraFeatureToggle = CameraFeatureToggle(requireContext())
+                cameraFeatureToggle = CameraFeatureToggle(requireContext(), remoteConfig),
+                accountFeatureToggle = AccountFeatureToggle(requireContext(), remoteConfig),
+                adsFeatureToggle = AdsFeatureToggle(requireContext(), remoteConfig),
+                articlesFeatureToggle = ArticlesFeatureToggle(requireContext(), remoteConfig),
+                currencyFeatureToggle = CurrencyFeatureToggle(requireContext(), remoteConfig),
+                weatherFeatureToggle = WeatherFeatureToggle(requireContext(), remoteConfig),
             )
         }
     )
@@ -172,6 +180,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         super.onViewCreated(view, savedInstanceState)
 
         accountButton = view.findViewById<ImageView>(R.id.main_account_button).apply {
+            isVisible = AccountFeatureToggle(requireContext(), remoteConfig).isActive() // TODO: VM
             setOnClickListener {
                 if (firebaseAuth.currentUser != null) {
                     openAccount()
@@ -202,6 +211,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         currencyLoader = view.findViewById(R.id.main_currency_container_loader)
         currencyError = view.findViewById(R.id.main_currency_container_error)
 
+        articlesContainer = view.findViewById(R.id.main_articles_container)
         articlesList = view.findViewById(R.id.main_articles_list)
         articlesLoader = view.findViewById(R.id.main_articles_container_loader)
         articlesError = view.findViewById(R.id.main_articles_container_error)
@@ -216,6 +226,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         }
 
         adView = view.findViewById<AdView>(R.id.main_ad_view).apply {
+            isVisible = AdsFeatureToggle(requireContext(), remoteConfig).isActive()
             resume()
             loadAd(viewModel.getAdRequest())
             adListener = viewModel.adListener
@@ -313,51 +324,50 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
                 weatherError.hide()
                 weatherData.isVisible = false
             }
+            MainViewModel.WeatherState.Disabled -> weatherContainer.isVisible = false
         }
 
-    private fun applyCurrencyState(currencyState: MainViewModel.CurrencyState) {
-        when (currencyState) {
-            is MainViewModel.CurrencyState.Success -> {
-                currencyList.isVisible = true
-                currencyLoader.isVisible = false
-                currencyError.hide()
+    private fun applyCurrencyState(currencyState: MainViewModel.CurrencyState) = when (currencyState) {
+        is MainViewModel.CurrencyState.Success -> {
+            currencyList.isVisible = true
+            currencyLoader.isVisible = false
+            currencyError.hide()
 
-                rubToUsd.text = getString(R.string.main_currency_usd, currencyState.exchangeRates.usdRate)
-                rubToEur.text = getString(R.string.main_currency_eur, currencyState.exchangeRates.eurRate)
-            }
-            is MainViewModel.CurrencyState.Loading -> {
-                currencyList.isVisible = false
-                currencyLoader.isVisible = true
-                currencyError.hide()
-            }
-            is MainViewModel.CurrencyState.Error -> {
-                currencyList.isVisible = false
-                currencyLoader.isVisible = false
-                currencyError.show(retryAction = { viewModel.loadCurrency() })
-            }
+            rubToUsd.text = getString(R.string.main_currency_usd, currencyState.exchangeRates.usdRate)
+            rubToEur.text = getString(R.string.main_currency_eur, currencyState.exchangeRates.eurRate)
         }
+        is MainViewModel.CurrencyState.Loading -> {
+            currencyList.isVisible = false
+            currencyLoader.isVisible = true
+            currencyError.hide()
+        }
+        is MainViewModel.CurrencyState.Error -> {
+            currencyList.isVisible = false
+            currencyLoader.isVisible = false
+            currencyError.show(retryAction = { viewModel.loadCurrency() })
+        }
+        MainViewModel.CurrencyState.Disabled -> currencyList.isVisible = false
     }
 
-    private fun applyArticlesState(articlesState: MainViewModel.ArticlesState) {
-        when (articlesState) {
-            is MainViewModel.ArticlesState.Error -> {
-                articlesList.isVisible = false
-                articlesLoader.isVisible = false
-                articlesError.show(retryAction = { viewModel.loadArticles() })
-            }
-            is MainViewModel.ArticlesState.Loading -> {
-                articlesList.isVisible = false
-                articlesLoader.isVisible = true
-                articlesError.hide()
-            }
-            is MainViewModel.ArticlesState.Success -> {
-                articlesList.isVisible = true
-                articlesLoader.isVisible = false
-                articlesError.hide()
-
-                articlesAdapter.submitList(articlesState.articles)
-            }
+    private fun applyArticlesState(articlesState: MainViewModel.ArticlesState) = when (articlesState) {
+        is MainViewModel.ArticlesState.Error -> {
+            articlesList.isVisible = false
+            articlesLoader.isVisible = false
+            articlesError.show(retryAction = { viewModel.loadArticles() })
         }
+        is MainViewModel.ArticlesState.Loading -> {
+            articlesList.isVisible = false
+            articlesLoader.isVisible = true
+            articlesError.hide()
+        }
+        is MainViewModel.ArticlesState.Success -> {
+            articlesList.isVisible = true
+            articlesLoader.isVisible = false
+            articlesError.hide()
+
+            articlesAdapter.submitList(articlesState.articles)
+        }
+        MainViewModel.ArticlesState.Disabled -> articlesContainer.isVisible = false
     }
 
     private fun applyCameraState(cameraState: MainViewModel.CameraState) = when (cameraState) {

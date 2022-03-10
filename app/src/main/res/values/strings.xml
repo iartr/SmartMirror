@@ -28,4 +28,9 @@
     <string name="account_phone">Phone: %s</string>
     <string name="account_provider_id">Provider id: %s</string>
     <string name="account_tenat_id">Tenat id: %s</string>
+    <string name="account_camera_enabled">Камера включена?</string>
+    <string name="account_ads_enabled">Реклама включена?</string>
+    <string name="account_artices_enabled">Статьи включены?</string>
+    <string name="account_currencies_enabled">Валюта включена?</string>
+    <string name="account_weather_enabled">Погода включена?</string>
 </resources>

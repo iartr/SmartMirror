@@ -12,6 +12,7 @@ import com.iartr.smartmirror.data.currency.ExchangeRates
 import com.iartr.smartmirror.data.currency.ICurrencyRepository
 import com.iartr.smartmirror.data.weather.IWeatherRepository
 import com.iartr.smartmirror.toggles.CameraFeatureToggle
+import com.iartr.smartmirror.toggles.FeatureToggle
 import com.iartr.smartmirror.ui.base.BaseViewModel
 import com.iartr.smartmirror.utils.subscribeSuccess
 import io.reactivex.rxjava3.core.Observable
@@ -21,7 +22,12 @@ class MainViewModel(
     private val weatherRepository: IWeatherRepository,
     private val currencyRepository: ICurrencyRepository,
     private val articlesRepository: IArticlesRepository,
-    private val cameraFeatureToggle: CameraFeatureToggle
+    private val cameraFeatureToggle: FeatureToggle,
+    private val accountFeatureToggle: FeatureToggle,
+    private val adsFeatureToggle: FeatureToggle,
+    private val articlesFeatureToggle: FeatureToggle,
+    private val currencyFeatureToggle: FeatureToggle,
+    private val weatherFeatureToggle: FeatureToggle
 ) : BaseViewModel() {
     private val weatherStateMutable = BehaviorSubject.createDefault<WeatherState>(WeatherState.Loading)
     val weatherState: Observable<WeatherState> = weatherStateMutable.distinctUntilChanged()
@@ -55,6 +61,11 @@ class MainViewModel(
     }
 
     fun loadWeather() {
+        if (!weatherFeatureToggle.isActive()) {
+            weatherStateMutable.onNext(WeatherState.Disabled)
+            return
+        }
+
         weatherRepository.getCurrentWeather()
             .doOnSubscribe { weatherStateMutable.onNext(WeatherState.Loading) }
             .doOnError { weatherStateMutable.onNext(WeatherState.Error) }
@@ -68,6 +79,11 @@ class MainViewModel(
     }
 
     fun loadCurrency() {
+        if (!currencyFeatureToggle.isActive()) {
+            currencyStateMutable.onNext(CurrencyState.Disabled)
+            return
+        }
+
         currencyRepository.getCurrencyExchangeRub()
             .doOnSubscribe { currencyStateMutable.onNext(CurrencyState.Loading) }
             .doOnError { currencyStateMutable.onNext(CurrencyState.Error) }
@@ -78,6 +94,11 @@ class MainViewModel(
     }
 
     fun loadArticles() {
+        if (!articlesFeatureToggle.isActive()) {
+            articlesStateMutable.onNext(ArticlesState.Disabled)
+            return
+        }
+
         articlesRepository.getLatest()
             .doOnSubscribe { articlesStateMutable.onNext(ArticlesState.Loading) }
             .doOnError { articlesStateMutable.onNext(ArticlesState.Error) }
@@ -110,18 +131,21 @@ class MainViewModel(
         data class Success(val temperature: String, val icon: String) : WeatherState
         object Loading : WeatherState
         object Error : WeatherState
+        object Disabled : WeatherState
     }
 
     sealed interface CurrencyState {
         data class Success(val exchangeRates: ExchangeRates) : CurrencyState
         object Loading : CurrencyState
         object Error : CurrencyState
+        object Disabled : CurrencyState
     }
 
     sealed interface ArticlesState {
         data class Success(val articles: List<Article>) : ArticlesState
         object Loading : ArticlesState
         object Error : ArticlesState
+        object Disabled : ArticlesState
     }
 
     sealed interface CameraState {
@@ -134,10 +158,15 @@ class MainViewModel(
         private val weatherRepository: IWeatherRepository,
         private val currencyRepository: ICurrencyRepository,
         private val articlesRepository: IArticlesRepository,
-        private val cameraFeatureToggle: CameraFeatureToggle
+        private val cameraFeatureToggle: FeatureToggle,
+        private val accountFeatureToggle: FeatureToggle,
+        private val adsFeatureToggle: FeatureToggle,
+        private val articlesFeatureToggle: FeatureToggle,
+        private val currencyFeatureToggle: FeatureToggle,
+        private val weatherFeatureToggle: FeatureToggle
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return MainViewModel(weatherRepository, currencyRepository, articlesRepository, cameraFeatureToggle) as T
+            return MainViewModel(weatherRepository, currencyRepository, articlesRepository, cameraFeatureToggle, accountFeatureToggle, adsFeatureToggle, articlesFeatureToggle, currencyFeatureToggle, weatherFeatureToggle) as T
         }
     }
 }

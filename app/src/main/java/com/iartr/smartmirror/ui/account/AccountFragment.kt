@@ -2,16 +2,17 @@ package com.iartr.smartmirror.ui.account
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentManager
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.iartr.smartmirror.R
+import com.iartr.smartmirror.toggles.*
 import com.iartr.smartmirror.ui.base.BaseFragment
 
 class AccountFragment : BaseFragment(R.layout.fragment_account) {
@@ -30,11 +31,29 @@ class AccountFragment : BaseFragment(R.layout.fragment_account) {
         }
     }
     private val firebaseAuth: FirebaseAuth = Firebase.auth
+    private val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
+
+    // TODO: vm
+    private lateinit var cameraToggle: FeatureToggle
+    private lateinit var adsToggle: FeatureToggle
+    private lateinit var articlesToggle: FeatureToggle
+    private lateinit var currencyToggle: FeatureToggle
+    private lateinit var weatherToggle: FeatureToggle
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         firebaseAuth.addAuthStateListener(firebaseAuthStateListener)
         val user = firebaseAuth.currentUser ?: return
+
+        cameraToggle = CameraFeatureToggle(view.context, remoteConfig)
+        adsToggle = AdsFeatureToggle(view.context, remoteConfig)
+        articlesToggle = ArticlesFeatureToggle(view.context, remoteConfig)
+        currencyToggle = CurrencyFeatureToggle(view.context, remoteConfig)
+        weatherToggle = WeatherFeatureToggle(view.context, remoteConfig)
+
+        view.findViewById<Toolbar>(R.id.account_toolbar).apply {
+            setNavigationOnClickListener { back() }
+        }
         view.findViewById<ImageView>(R.id.account_photo).apply {
             Glide.with(this).load(user.photoUrl).into(this)
         }
@@ -61,6 +80,36 @@ class AccountFragment : BaseFragment(R.layout.fragment_account) {
         }
         view.findViewById<TextView>(R.id.account_tenat_id).apply {
             text = getString(R.string.account_tenat_id, user.tenantId)
+        }
+        view.findViewById<CheckBox>(R.id.account_camera_checkbox).apply {
+            isChecked = cameraToggle.isActive()
+            setOnCheckedChangeListener { _, isChecked ->
+                cameraToggle.setActive(isChecked)
+            }
+        }
+        view.findViewById<CheckBox>(R.id.account_ads_checkbox).apply {
+            isChecked = adsToggle.isActive()
+            setOnCheckedChangeListener { _, isChecked ->
+                adsToggle.setActive(isChecked)
+            }
+        }
+        view.findViewById<CheckBox>(R.id.account_articles_checkbox).apply {
+            isChecked = articlesToggle.isActive()
+            setOnCheckedChangeListener { _, isChecked ->
+                articlesToggle.setActive(isChecked)
+            }
+        }
+        view.findViewById<CheckBox>(R.id.account_currencies_checkbox).apply {
+            isChecked = currencyToggle.isActive()
+            setOnCheckedChangeListener { _, isChecked ->
+                currencyToggle.setActive(isChecked)
+            }
+        }
+        view.findViewById<CheckBox>(R.id.account_weather_checkbox).apply {
+            isChecked = weatherToggle.isActive()
+            setOnCheckedChangeListener { _, isChecked ->
+                weatherToggle.setActive(isChecked)
+            }
         }
         view.findViewById<Button>(R.id.account_sign_out_button).apply {
             setOnClickListener { firebaseAuth.signOut() }

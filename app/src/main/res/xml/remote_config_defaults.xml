@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap>
+    <entry>
+        <key>feature_account_enabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>feature_ads_enabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>feature_articles_enabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>feature_currency_enabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>feature_weather_enabled</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>camera_enabled</key>
+        <value>true</value>
+    </entry>
+</defaultsMap>
