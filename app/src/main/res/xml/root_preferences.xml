@@ -3,8 +3,8 @@
     <PreferenceCategory app:title="@string/preference_header">
 
         <SwitchPreference
-            app:defaultValue="false"
-            app:key="pref_camera_is_active"
+            app:defaultValue="true"
+            app:key="camera_enabled"
             app:title="@string/preference_camera"
             app:useSimpleSummaryProvider="true" />
 

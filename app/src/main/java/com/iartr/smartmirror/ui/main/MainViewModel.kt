@@ -61,54 +61,59 @@ class MainViewModel(
     }
 
     fun loadWeather() {
-        if (!weatherFeatureToggle.isActive()) {
-            weatherStateMutable.onNext(WeatherState.Disabled)
-            return
-        }
-
-        weatherRepository.getCurrentWeather()
+        weatherFeatureToggle.isActive().zipWith(weatherRepository.getCurrentWeather(), { t1, t2 -> t1 to t2 })
             .doOnSubscribe { weatherStateMutable.onNext(WeatherState.Loading) }
             .doOnError { weatherStateMutable.onNext(WeatherState.Error) }
-            .subscribeSuccess {
+            .subscribeSuccess { (isActive, weather) ->
+                if (!isActive) {
+                    weatherStateMutable.onNext(WeatherState.Disabled)
+                    return@subscribeSuccess
+                }
+
 //                val icon = it.weatherDescriptions.first().icon.toString()
-                val icon = it.weatherDescriptions.first().description
-                val temp = it.temperature.temp.toInt().toString()
+                val icon = weather.weatherDescriptions.first().description
+                val temp = weather.temperature.temp.toInt().toString()
                 weatherStateMutable.onNext(WeatherState.Success(temp, icon))
             }
             .addTo(disposables)
     }
 
     fun loadCurrency() {
-        if (!currencyFeatureToggle.isActive()) {
-            currencyStateMutable.onNext(CurrencyState.Disabled)
-            return
-        }
-
-        currencyRepository.getCurrencyExchangeRub()
+        currencyFeatureToggle.isActive().zipWith(currencyRepository.getCurrencyExchangeRub(), { t1, t2 -> t1 to t2 })
             .doOnSubscribe { currencyStateMutable.onNext(CurrencyState.Loading) }
             .doOnError { currencyStateMutable.onNext(CurrencyState.Error) }
-            .subscribeSuccess {
-                currencyStateMutable.onNext(CurrencyState.Success(it))
+            .subscribeSuccess { (isActive, exchangeRate) ->
+                if (!isActive) {
+                    currencyStateMutable.onNext(CurrencyState.Disabled)
+                    return@subscribeSuccess
+                }
+
+                currencyStateMutable.onNext(CurrencyState.Success(exchangeRate))
             }
             .addTo(disposables)
     }
 
     fun loadArticles() {
-        if (!articlesFeatureToggle.isActive()) {
-            articlesStateMutable.onNext(ArticlesState.Disabled)
-            return
-        }
-
-        articlesRepository.getLatest()
+        articlesFeatureToggle.isActive().zipWith(articlesRepository.getLatest(), { t1, t2 -> t1 to t2 })
             .doOnSubscribe { articlesStateMutable.onNext(ArticlesState.Loading) }
             .doOnError { articlesStateMutable.onNext(ArticlesState.Error) }
-            .subscribeSuccess { articlesStateMutable.onNext(ArticlesState.Success(it)) }
+            .subscribeSuccess { (isActive, articles) ->
+                if (!isActive) {
+                    articlesStateMutable.onNext(ArticlesState.Disabled)
+                    return@subscribeSuccess
+                }
+
+                articlesStateMutable.onNext(ArticlesState.Success(articles))
+            }
             .addTo(disposables)
     }
 
     fun loadCameraState() {
-        val isActive = cameraFeatureToggle.isActive()
-        cameraStateMutable.onNext(if (isActive) CameraState.Visible else CameraState.Hide)
+        cameraFeatureToggle.isActive()
+            .subscribeSuccess { isActive ->
+                cameraStateMutable.onNext(if (isActive) CameraState.Visible else CameraState.Hide)
+            }
+            .addTo(disposables)
     }
 
     fun getAdRequest(): AdRequest {

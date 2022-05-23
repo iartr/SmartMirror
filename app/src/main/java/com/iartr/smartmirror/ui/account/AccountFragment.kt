@@ -8,12 +8,15 @@ import androidx.fragment.app.FragmentManager
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.iartr.smartmirror.R
 import com.iartr.smartmirror.toggles.*
 import com.iartr.smartmirror.ui.base.BaseFragment
+import com.iartr.smartmirror.utils.subscribeSuccess
 
 class AccountFragment : BaseFragment(R.layout.fragment_account) {
 
@@ -32,24 +35,34 @@ class AccountFragment : BaseFragment(R.layout.fragment_account) {
     }
     private val firebaseAuth: FirebaseAuth = Firebase.auth
     private val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
+    private val firebaseDatabase: DatabaseReference = Firebase.database.reference.child("${firebaseAuth.uid}")
 
     // TODO: vm
     private lateinit var cameraToggle: FeatureToggle
+    private lateinit var cameraCheckBox: CheckBox
+
     private lateinit var adsToggle: FeatureToggle
+    private lateinit var adsCheckBox: CheckBox
+
     private lateinit var articlesToggle: FeatureToggle
+    private lateinit var articlesCheckBox: CheckBox
+
     private lateinit var currencyToggle: FeatureToggle
+    private lateinit var currencyCheckBox: CheckBox
+
     private lateinit var weatherToggle: FeatureToggle
+    private lateinit var weatherCheckBox: CheckBox
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         firebaseAuth.addAuthStateListener(firebaseAuthStateListener)
         val user = firebaseAuth.currentUser ?: return
 
-        cameraToggle = CameraFeatureToggle(view.context, remoteConfig)
-        adsToggle = AdsFeatureToggle(view.context, remoteConfig)
-        articlesToggle = ArticlesFeatureToggle(view.context, remoteConfig)
-        currencyToggle = CurrencyFeatureToggle(view.context, remoteConfig)
-        weatherToggle = WeatherFeatureToggle(view.context, remoteConfig)
+        cameraToggle = CameraFeatureToggle(requireContext(), remoteConfig, firebaseDatabase)
+        adsToggle = AdsFeatureToggle(remoteConfig, firebaseDatabase)
+        articlesToggle = ArticlesFeatureToggle(remoteConfig, firebaseDatabase)
+        currencyToggle = CurrencyFeatureToggle(remoteConfig, firebaseDatabase)
+        weatherToggle = WeatherFeatureToggle(remoteConfig, firebaseDatabase)
 
         view.findViewById<Toolbar>(R.id.account_toolbar).apply {
             setNavigationOnClickListener { back() }
@@ -81,39 +94,45 @@ class AccountFragment : BaseFragment(R.layout.fragment_account) {
         view.findViewById<TextView>(R.id.account_tenat_id).apply {
             text = getString(R.string.account_tenat_id, user.tenantId)
         }
-        view.findViewById<CheckBox>(R.id.account_camera_checkbox).apply {
-            isChecked = cameraToggle.isActive()
+        cameraCheckBox = view.findViewById<CheckBox>(R.id.account_camera_checkbox).apply {
+//            isChecked = cameraToggle.isActive()
             setOnCheckedChangeListener { _, isChecked ->
-                cameraToggle.setActive(isChecked)
+                cameraToggle.setActive(isChecked).subscribe()
             }
         }
-        view.findViewById<CheckBox>(R.id.account_ads_checkbox).apply {
-            isChecked = adsToggle.isActive()
+        adsCheckBox = view.findViewById<CheckBox>(R.id.account_ads_checkbox).apply {
+//            isChecked = adsToggle.isActive()
             setOnCheckedChangeListener { _, isChecked ->
-                adsToggle.setActive(isChecked)
+                adsToggle.setActive(isChecked).subscribe()
             }
         }
-        view.findViewById<CheckBox>(R.id.account_articles_checkbox).apply {
-            isChecked = articlesToggle.isActive()
+        articlesCheckBox = view.findViewById<CheckBox>(R.id.account_articles_checkbox).apply {
+//            isChecked = articlesToggle.isActive()
             setOnCheckedChangeListener { _, isChecked ->
-                articlesToggle.setActive(isChecked)
+                articlesToggle.setActive(isChecked).subscribe()
             }
         }
-        view.findViewById<CheckBox>(R.id.account_currencies_checkbox).apply {
-            isChecked = currencyToggle.isActive()
+        currencyCheckBox = view.findViewById<CheckBox>(R.id.account_currencies_checkbox).apply {
+//            isChecked = currencyToggle.isActive()
             setOnCheckedChangeListener { _, isChecked ->
-                currencyToggle.setActive(isChecked)
+                currencyToggle.setActive(isChecked).subscribe()
             }
         }
-        view.findViewById<CheckBox>(R.id.account_weather_checkbox).apply {
-            isChecked = weatherToggle.isActive()
+        weatherCheckBox = view.findViewById<CheckBox>(R.id.account_weather_checkbox).apply {
+//            isChecked = weatherToggle.isActive()
             setOnCheckedChangeListener { _, isChecked ->
-                weatherToggle.setActive(isChecked)
+                weatherToggle.setActive(isChecked).subscribe()
             }
         }
         view.findViewById<Button>(R.id.account_sign_out_button).apply {
             setOnClickListener { firebaseAuth.signOut() }
         }
+
+        cameraToggle.isActive().subscribeSuccess(cameraCheckBox::setChecked)
+        adsToggle.isActive().subscribeSuccess(adsCheckBox::setChecked)
+        articlesToggle.isActive().subscribeSuccess(articlesCheckBox::setChecked)
+        currencyToggle.isActive().subscribeSuccess(currencyCheckBox::setChecked)
+        weatherToggle.isActive().subscribeSuccess(weatherCheckBox::setChecked)
     }
 
     override fun onDestroyView() {

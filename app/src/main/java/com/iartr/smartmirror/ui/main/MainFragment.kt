@@ -51,6 +51,7 @@ import com.iartr.smartmirror.ui.debug.PreferenceActivity
 import com.iartr.smartmirror.ui.base.BaseFragment
 import com.iartr.smartmirror.ui.main.articles.ArticlesAdapter
 import com.iartr.smartmirror.utils.RetryingErrorView
+import com.iartr.smartmirror.utils.subscribeSuccess
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.math.abs
@@ -111,29 +112,6 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         } ?: Unit
     }
 
-    private val remoteConfig = Firebase.remoteConfig
-    // TODO: to repository + RxJava. Move camera to CameraController
-    private val database = Firebase.database
-    private val facesDatabase = database.reference.child("faces")
-    private val viewModel: MainViewModel by viewModels(
-        factoryProducer = {
-            MainViewModel.Factory(
-                weatherRepository = WeatherRepository(
-                    api = weatherApi,
-                    coordRepository = CoordRepository(coordApi = coordApi)
-                ),
-                currencyRepository = CurrencyRepository(api = currencyApi),
-                articlesRepository = ArticlesRepository(api = newsApi),
-                cameraFeatureToggle = CameraFeatureToggle(requireContext(), remoteConfig),
-                accountFeatureToggle = AccountFeatureToggle(requireContext(), remoteConfig),
-                adsFeatureToggle = AdsFeatureToggle(requireContext(), remoteConfig),
-                articlesFeatureToggle = ArticlesFeatureToggle(requireContext(), remoteConfig),
-                currencyFeatureToggle = CurrencyFeatureToggle(requireContext(), remoteConfig),
-                weatherFeatureToggle = WeatherFeatureToggle(requireContext(), remoteConfig),
-            )
-        }
-    )
-
     // TODO: auth controller
     private val firebaseAuth: FirebaseAuth = Firebase.auth
     private val firebaseAuthStateListener: FirebaseAuth.AuthStateListener = object : FirebaseAuth.AuthStateListener {
@@ -167,6 +145,30 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
             .addOnCompleteListener(requireActivity()) { android.util.Log.d("GoogleAuthController", "Task completed") }
     }
 
+    private val remoteConfig = Firebase.remoteConfig
+    // TODO: to repository + RxJava. Move camera to CameraController
+    private val database = Firebase.database
+    private val facesDatabase = database.reference.child("faces")
+    private val userDatabase = database.reference.child("${firebaseAuth.uid}")
+    private val viewModel: MainViewModel by viewModels(
+        factoryProducer = {
+            MainViewModel.Factory(
+                weatherRepository = WeatherRepository(
+                    api = weatherApi,
+                    coordRepository = CoordRepository(coordApi = coordApi)
+                ),
+                currencyRepository = CurrencyRepository(api = currencyApi),
+                articlesRepository = ArticlesRepository(api = newsApi),
+                cameraFeatureToggle = CameraFeatureToggle(requireContext(), remoteConfig, userDatabase),
+                accountFeatureToggle = AccountFeatureToggle(remoteConfig, userDatabase),
+                adsFeatureToggle = AdsFeatureToggle(remoteConfig, userDatabase),
+                articlesFeatureToggle = ArticlesFeatureToggle(remoteConfig, userDatabase),
+                currencyFeatureToggle = CurrencyFeatureToggle(remoteConfig, userDatabase),
+                weatherFeatureToggle = WeatherFeatureToggle(remoteConfig, userDatabase),
+            )
+        }
+    )
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -180,7 +182,6 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         super.onViewCreated(view, savedInstanceState)
 
         accountButton = view.findViewById<ImageView>(R.id.main_account_button).apply {
-            isVisible = AccountFeatureToggle(requireContext(), remoteConfig).isActive() // TODO: VM
             setOnClickListener {
                 if (firebaseAuth.currentUser != null) {
                     openAccount()
@@ -201,6 +202,8 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
                 true
             }
         }
+        AccountFeatureToggle(remoteConfig, userDatabase).isActive()
+            .subscribeSuccess { accountButton.isVisible = it }
         weatherContainer = view.findViewById(R.id.main_weather_container)
         weatherData = view.findViewById(R.id.main_weather_container_data)
         weatherLoading = view.findViewById(R.id.main_weather_container_loader)
@@ -226,11 +229,12 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         }
 
         adView = view.findViewById<AdView>(R.id.main_ad_view).apply {
-            isVisible = AdsFeatureToggle(requireContext(), remoteConfig).isActive()
             resume()
             loadAd(viewModel.getAdRequest())
             adListener = viewModel.adListener
         }
+        AdsFeatureToggle(remoteConfig, userDatabase).isActive()
+            .subscribeSuccess { adView.isVisible = it }
 
         viewModel.weatherState.subscribeWithFragment(::applyWeatherState)
         viewModel.currencyState.subscribeWithFragment(::applyCurrencyState)

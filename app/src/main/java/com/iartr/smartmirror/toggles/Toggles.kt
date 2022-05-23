@@ -3,19 +3,30 @@ package com.iartr.smartmirror.toggles
 import android.content.Context
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.getValue
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 
 class WeatherFeatureToggle(
-    private val context: Context,
-    private val remoteConfig: FirebaseRemoteConfig
+    private val remoteConfig: FirebaseRemoteConfig,
+    private val userDatabase: DatabaseReference
 ) : FeatureToggle {
-    override fun isActive(): Boolean {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(IS_WEATHER_ENABLED, true)
-                && remoteConfig.getBoolean(IS_WEATHER_ENABLED)
+    override fun isActive(): Single<Boolean> {
+        return Single.create { emitter ->
+            userDatabase.child(IS_WEATHER_ENABLED).get()
+                .addOnSuccessListener { emitter.onSuccess(it.getValue<Boolean>() ?: true && remoteConfig.getBoolean(IS_WEATHER_ENABLED)) }
+                .addOnFailureListener { emitter.tryOnError(it) }
+        }
     }
 
-    override fun setActive(isActive: Boolean) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit { putBoolean(IS_WEATHER_ENABLED, isActive) }
+    override fun setActive(isActive: Boolean): Completable {
+        return Completable.create { emitter ->
+            userDatabase.child(IS_WEATHER_ENABLED).setValue(isActive)
+                .addOnSuccessListener { emitter.onComplete() }
+                .addOnFailureListener { emitter.tryOnError(it) }
+        }
     }
 
     private companion object {
@@ -24,16 +35,23 @@ class WeatherFeatureToggle(
 }
 
 class CurrencyFeatureToggle(
-    private val context: Context,
-    private val remoteConfig: FirebaseRemoteConfig
+    private val remoteConfig: FirebaseRemoteConfig,
+    private val userDatabase: DatabaseReference
 ) : FeatureToggle {
-    override fun isActive(): Boolean {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(IS_CURRENCY_ENABLED, true)
-                && remoteConfig.getBoolean(IS_CURRENCY_ENABLED)
+    override fun isActive(): Single<Boolean> {
+        return Single.create { emitter ->
+            userDatabase.child(IS_CURRENCY_ENABLED).get()
+                .addOnSuccessListener { emitter.onSuccess(it.getValue<Boolean>() ?: true && remoteConfig.getBoolean(IS_CURRENCY_ENABLED)) }
+                .addOnFailureListener { emitter.tryOnError(it) }
+        }
     }
 
-    override fun setActive(isActive: Boolean) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit { putBoolean(IS_CURRENCY_ENABLED, isActive) }
+    override fun setActive(isActive: Boolean): Completable {
+        return Completable.create { emitter ->
+            userDatabase.child(IS_CURRENCY_ENABLED).setValue(isActive)
+                .addOnSuccessListener { emitter.onComplete() }
+                .addOnFailureListener { emitter.tryOnError(it) }
+        }
     }
 
     private companion object {
@@ -42,16 +60,23 @@ class CurrencyFeatureToggle(
 }
 
 class ArticlesFeatureToggle(
-    private val context: Context,
-    private val remoteConfig: FirebaseRemoteConfig
+    private val remoteConfig: FirebaseRemoteConfig,
+    private val userDatabase: DatabaseReference
 ) : FeatureToggle {
-    override fun isActive(): Boolean {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(IS_ARTICLES_ENABLED, true)
-                && remoteConfig.getBoolean(IS_ARTICLES_ENABLED)
+    override fun isActive(): Single<Boolean> {
+        return Single.create { emitter ->
+            userDatabase.child(IS_ARTICLES_ENABLED).get()
+                .addOnSuccessListener { emitter.onSuccess(it.getValue<Boolean>() ?: true && remoteConfig.getBoolean(IS_ARTICLES_ENABLED)) }
+                .addOnFailureListener { emitter.tryOnError(it) }
+        }
     }
 
-    override fun setActive(isActive: Boolean) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit { putBoolean(IS_ARTICLES_ENABLED, isActive) }
+    override fun setActive(isActive: Boolean): Completable {
+        return Completable.create { emitter ->
+            userDatabase.child(IS_ARTICLES_ENABLED).setValue(isActive)
+                .addOnSuccessListener { emitter.onComplete() }
+                .addOnFailureListener { emitter.tryOnError(it) }
+        }
     }
 
     private companion object {
@@ -60,16 +85,23 @@ class ArticlesFeatureToggle(
 }
 
 class AdsFeatureToggle(
-    private val context: Context,
-    private val remoteConfig: FirebaseRemoteConfig
+    private val remoteConfig: FirebaseRemoteConfig,
+    private val userDatabase: DatabaseReference
 ) : FeatureToggle {
-    override fun isActive(): Boolean {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(IS_ADS_ENABLED, true)
-                && remoteConfig.getBoolean(IS_ADS_ENABLED)
+    override fun isActive(): Single<Boolean> {
+        return Single.create { emitter ->
+            userDatabase.child(IS_ADS_ENABLED).get()
+                .addOnSuccessListener { emitter.onSuccess(it.getValue<Boolean>() ?: true && remoteConfig.getBoolean(IS_ADS_ENABLED)) }
+                .addOnFailureListener { emitter.tryOnError(it) }
+        }
     }
 
-    override fun setActive(isActive: Boolean) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit { putBoolean(IS_ADS_ENABLED, isActive) }
+    override fun setActive(isActive: Boolean): Completable {
+        return Completable.create { emitter ->
+            userDatabase.child(IS_ADS_ENABLED).setValue(isActive)
+                .addOnSuccessListener { emitter.onComplete() }
+                .addOnFailureListener { emitter.tryOnError(it) }
+        }
     }
 
     private companion object {
@@ -78,16 +110,26 @@ class AdsFeatureToggle(
 }
 
 class AccountFeatureToggle(
-    private val context: Context,
-    private val remoteConfig: FirebaseRemoteConfig
+    private val remoteConfig: FirebaseRemoteConfig,
+    private val userDatabase: DatabaseReference
 ) : FeatureToggle {
-    override fun isActive(): Boolean {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(IS_ACCOUNT_ENABLED, true)
-                && remoteConfig.getBoolean(IS_ACCOUNT_ENABLED)
+    override fun isActive(): Single<Boolean> {
+        return Single.create<Boolean> { emitter ->
+            userDatabase.child(IS_ACCOUNT_ENABLED).get()
+                .addOnSuccessListener {
+                    val value = it.getValue<Boolean>() ?: true && remoteConfig.getBoolean(IS_ACCOUNT_ENABLED)
+                    emitter.onSuccess(value)
+                }
+                .addOnFailureListener { emitter.tryOnError(it) }
+        }
     }
 
-    override fun setActive(isActive: Boolean) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit { putBoolean(IS_ACCOUNT_ENABLED, isActive) }
+    override fun setActive(isActive: Boolean): Completable {
+        return Completable.create { emitter ->
+            userDatabase.child(IS_ACCOUNT_ENABLED).setValue(isActive)
+                .addOnSuccessListener { emitter.onComplete() }
+                .addOnFailureListener { emitter.tryOnError(it) }
+        }
     }
 
     private companion object {
@@ -97,16 +139,29 @@ class AccountFeatureToggle(
 
 class CameraFeatureToggle(
     private val context: Context,
-    private val remoteConfig: FirebaseRemoteConfig
+    private val remoteConfig: FirebaseRemoteConfig,
+    private val userDatabase: DatabaseReference,
 ) : FeatureToggle {
 
-    override fun isActive(): Boolean {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(IS_CAMERA_ACTIVE, true)
-                && remoteConfig.getBoolean(IS_CAMERA_ACTIVE)
+    override fun isActive(): Single<Boolean> {
+        return Single.create { emitter ->
+            userDatabase.child(IS_CAMERA_ACTIVE).get()
+                .addOnSuccessListener {
+                    emitter.onSuccess(it.getValue<Boolean>() ?: true
+                            && remoteConfig.getBoolean(IS_CAMERA_ACTIVE)
+                            && PreferenceManager.getDefaultSharedPreferences(context).getBoolean(IS_CAMERA_ACTIVE, true))
+                }
+                .addOnFailureListener { emitter.tryOnError(it) }
+        }
     }
 
-    override fun setActive(isActive: Boolean) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit { putBoolean(IS_CAMERA_ACTIVE, isActive) }
+    override fun setActive(isActive: Boolean): Completable {
+        return Completable.create { emitter ->
+            PreferenceManager.getDefaultSharedPreferences(context).edit { putBoolean(IS_CAMERA_ACTIVE, isActive) }
+            userDatabase.child(IS_CAMERA_ACTIVE).setValue(isActive)
+                .addOnSuccessListener { emitter.onComplete() }
+                .addOnFailureListener { emitter.tryOnError(it) }
+        }
     }
 
     private companion object {

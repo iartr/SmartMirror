@@ -28,7 +28,7 @@ class PreferenceActivity : AppCompatActivity() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
-            findPreference<SwitchPreference>("pref_camera_is_active")
+            findPreference<SwitchPreference>("camera_enabled")
                 ?.setOnPreferenceChangeListener { preference, newValue ->
                     showRestartAppDialog()
                     true
