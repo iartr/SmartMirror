@@ -181,6 +181,8 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.loadAll()
+
         accountButton = view.findViewById<ImageView>(R.id.main_account_button).apply {
             setOnClickListener {
                 if (firebaseAuth.currentUser != null) {

@@ -53,7 +53,7 @@ class MainViewModel(
         }
     }
 
-    init {
+    fun loadAll() {
         loadWeather()
         loadCurrency()
         loadArticles()
