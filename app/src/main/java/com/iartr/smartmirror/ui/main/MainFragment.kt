@@ -50,6 +50,7 @@ import com.iartr.smartmirror.ui.account.AccountFragment
 import com.iartr.smartmirror.ui.debug.PreferenceActivity
 import com.iartr.smartmirror.ui.base.BaseFragment
 import com.iartr.smartmirror.ui.main.articles.ArticlesAdapter
+import com.iartr.smartmirror.ui.weather.WeatherFragment
 import com.iartr.smartmirror.utils.RetryingErrorView
 import com.iartr.smartmirror.utils.subscribeSuccess
 import java.util.concurrent.ExecutorService
@@ -242,6 +243,8 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         viewModel.currencyState.subscribeWithFragment(::applyCurrencyState)
         viewModel.articlesState.subscribeWithFragment(::applyArticlesState)
         viewModel.cameraState.subscribeWithFragment(::applyCameraState)
+
+        weatherContainer.apply { setOnClickListener { openWeather() } }
     }
 
     override fun onDestroyView() {
@@ -496,6 +499,14 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
             ?.beginTransaction()
             ?.addToBackStack(null)
             ?.replace(R.id.fragment_container_view, AccountFragment.newInstance())
+            ?.commit()
+    }
+
+    private fun openWeather() {
+        activity?.supportFragmentManager
+            ?.beginTransaction()
+            ?.addToBackStack(null)
+            ?.replace(R.id.fragment_container_view, WeatherFragment.newInstance())
             ?.commit()
     }
 

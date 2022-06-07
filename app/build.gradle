@@ -24,10 +24,10 @@ android {
     props.load(new FileInputStream(rootProject.file("local.properties")))
     signingConfigs {
         common {
-            storeFile file("SmartMirrorKey.keystore")
-            storePassword props['signing.password']
-            keyAlias props['signing.alias']
-            keyPassword props['signing.password']
+            storeFile file(var)
+            storePassword '1234567'
+            keyAlias 'AndroidApp'
+            keyPassword '1234567'
         }
     }
 
