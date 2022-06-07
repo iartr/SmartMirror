@@ -3,18 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/HSE/MobileDevelopment/GroupProject/SmartMirror/app/src/main/res/drawable/background_weather.xml" value="0.266" />
         <entry key="..\:/HSE/MobileDevelopment/GroupProject/SmartMirror/app/src/main/res/layout/activity_main.xml" value="0.2994791666666667" />
-        <entry key="..\:/HSE/MobileDevelopment/GroupProject/SmartMirror/app/src/main/res/layout/activity_weather.xml" value="0.26927083333333335" />
-        <entry key="..\:/HSE/MobileDevelopment/GroupProject/SmartMirror/app/src/main/res/layout/article_item.xml" value="0.29635416666666664" />
-        <entry key="..\:/HSE/MobileDevelopment/GroupProject/SmartMirror/app/src/main/res/layout/daytemp_item.xml" value="0.25" />
         <entry key="..\:/HSE/MobileDevelopment/GroupProject/SmartMirror/app/src/main/res/layout/fragment_account.xml" value="0.2994791666666667" />
-        <entry key="..\:/HSE/MobileDevelopment/GroupProject/SmartMirror/app/src/main/res/layout/fragment_curweather.xml" value="0.3140625" />
-        <entry key="..\:/HSE/MobileDevelopment/GroupProject/SmartMirror/app/src/main/res/layout/fragment_daytemp.xml" value="0.2558876811594203" />
         <entry key="..\:/HSE/MobileDevelopment/GroupProject/SmartMirror/app/src/main/res/layout/fragment_main.xml" value="0.2994791666666667" />
-        <entry key="..\:/HSE/MobileDevelopment/GroupProject/SmartMirror/app/src/main/res/layout/fragment_weather.xml" value="0.25" />
-        <entry key="..\:/HSE/MobileDevelopment/GroupProject/SmartMirror/app/src/main/res/layout/fragment_weektemp.xml" value="0.2526041666666667" />
-        <entry key="..\:/HSE/MobileDevelopment/GroupProject/SmartMirror/app/src/main/res/layout/weektemp_item.xml" value="0.22" />
+        <entry key="..\:/HSE/MobileDevelopment/GroupProject/SmartMirror/app/src/main/res/layout/fragment_weather.xml" value="0.2994791666666667" />
       </map>
     </option>
   </component>

@@ -502,14 +502,6 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
             ?.commit()
     }
 
-    private fun openCurrencyList() {
-        activity?.supportFragmentManager
-            ?.beginTransaction()
-            ?.addToBackStack(null)
-            ?.replace(R.id.fragment_container_view, CurrencyFragment.newInstance())
-            ?.commit()
-    }
-
     private fun openWeather() {
         activity?.supportFragmentManager
             ?.beginTransaction()
