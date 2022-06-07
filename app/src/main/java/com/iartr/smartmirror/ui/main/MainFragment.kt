@@ -49,7 +49,6 @@ import com.iartr.smartmirror.toggles.*
 import com.iartr.smartmirror.ui.account.AccountFragment
 import com.iartr.smartmirror.ui.debug.PreferenceActivity
 import com.iartr.smartmirror.ui.base.BaseFragment
-import com.iartr.smartmirror.ui.currency.main.CurrencyFragment
 import com.iartr.smartmirror.ui.main.articles.ArticlesAdapter
 import com.iartr.smartmirror.utils.RetryingErrorView
 import com.iartr.smartmirror.utils.subscribeSuccess
@@ -60,7 +59,6 @@ import kotlin.math.max
 import kotlin.math.min
 
 class MainFragment : BaseFragment(R.layout.fragment_main) {
-
     private lateinit var accountButton: ImageView
     private lateinit var weatherContainer: View
     private lateinit var weatherData: TextView
@@ -72,7 +70,6 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
     private lateinit var rubToEur: TextView
     private lateinit var currencyLoader: ProgressBar
     private lateinit var currencyError: RetryingErrorView
-    private lateinit var currencyButton: Button
 
     private lateinit var articlesContainer: View
     private lateinit var articlesList: RecyclerView
@@ -82,13 +79,12 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
 
     private lateinit var adView: AdView
 
-    private val requestCamera =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            cameraView.isVisible = isGranted
-            if (isGranted) {
-                setupCamera()
-            }
+    private val requestCamera = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        cameraView.isVisible = isGranted
+        if (isGranted) {
+            setupCamera()
         }
+    }
     private lateinit var cameraView: PreviewView
     private lateinit var executor: ExecutorService
     private lateinit var displayManager: DisplayManager
@@ -98,7 +94,6 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
     private var cameraProvider: ProcessCameraProvider? = null
     private var camera: Camera? = null
     private var lensFacing = CameraSelector.LENS_FACING_FRONT
-
     /**
      * We need a display listener for orientation changes that do not trigger a configuration
      * change, for example if we choose to override config change in manifest or for 180-degree
@@ -119,64 +114,38 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
 
     // TODO: auth controller
     private val firebaseAuth: FirebaseAuth = Firebase.auth
-    private val firebaseAuthStateListener: FirebaseAuth.AuthStateListener =
-        object : FirebaseAuth.AuthStateListener {
-            override fun onAuthStateChanged(auth: FirebaseAuth) {
-                // Right after the listener has been registered
-                // When a user is signed in
-                // When the current user is signed out
-                // When the current user changes
+    private val firebaseAuthStateListener: FirebaseAuth.AuthStateListener = object : FirebaseAuth.AuthStateListener {
+        override fun onAuthStateChanged(auth: FirebaseAuth) {
+            // Right after the listener has been registered
+            // When a user is signed in
+            // When the current user is signed out
+            // When the current user changes
 
 
+        }
+    }
+    private val googleAuthResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        GoogleSignIn.getSignedInAccountFromIntent(it.data)
+            .addOnSuccessListener(requireActivity()) { googleAccount ->
+                android.util.Log.d("GoogleAuthController", "Success: $googleAccount")
+                val googleCredentials = GoogleAuthProvider.getCredential(googleAccount.idToken, null)
+                firebaseAuth.signInWithCredential(googleCredentials)
+                    .addOnSuccessListener(requireActivity()) {
+                        it.additionalUserInfo
+                        it.credential
+                        it.user
+
+                        // TODO: router
+                        openAccount()
+                    }
+                    .addOnFailureListener(requireActivity()) { android.util.Log.e("GoogleAuthController", "Failed", it) }
+                    .addOnCompleteListener(requireActivity()) { android.util.Log.d("GoogleAuthController", "Task completed") }
             }
-        }
-    private val googleAuthResultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            GoogleSignIn.getSignedInAccountFromIntent(it.data)
-                .addOnSuccessListener(requireActivity()) { googleAccount ->
-                    android.util.Log.d("GoogleAuthController", "Success: $googleAccount")
-                    val googleCredentials =
-                        GoogleAuthProvider.getCredential(googleAccount.idToken, null)
-                    firebaseAuth.signInWithCredential(googleCredentials)
-                        .addOnSuccessListener(requireActivity()) {
-                            it.additionalUserInfo
-                            it.credential
-                            it.user
-
-                            // TODO: router
-                            openAccount()
-                        }
-                        .addOnFailureListener(requireActivity()) {
-                            android.util.Log.e(
-                                "GoogleAuthController",
-                                "Failed",
-                                it
-                            )
-                        }
-                        .addOnCompleteListener(requireActivity()) {
-                            android.util.Log.d(
-                                "GoogleAuthController",
-                                "Task completed"
-                            )
-                        }
-                }
-                .addOnFailureListener(requireActivity()) {
-                    android.util.Log.e(
-                        "GoogleAuthController",
-                        "Failed",
-                        it
-                    )
-                }
-                .addOnCompleteListener(requireActivity()) {
-                    android.util.Log.d(
-                        "GoogleAuthController",
-                        "Task completed"
-                    )
-                }
-        }
+            .addOnFailureListener(requireActivity()) { android.util.Log.e("GoogleAuthController", "Failed", it) }
+            .addOnCompleteListener(requireActivity()) { android.util.Log.d("GoogleAuthController", "Task completed") }
+    }
 
     private val remoteConfig = Firebase.remoteConfig
-
     // TODO: to repository + RxJava. Move camera to CameraController
     private val database = Firebase.database
     private val facesDatabase = database.reference.child("faces")
@@ -190,11 +159,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
                 ),
                 currencyRepository = CurrencyRepository(api = currencyApi),
                 articlesRepository = ArticlesRepository(api = newsApi),
-                cameraFeatureToggle = CameraFeatureToggle(
-                    requireContext(),
-                    remoteConfig,
-                    userDatabase
-                ),
+                cameraFeatureToggle = CameraFeatureToggle(requireContext(), remoteConfig, userDatabase),
                 accountFeatureToggle = AccountFeatureToggle(remoteConfig, userDatabase),
                 adsFeatureToggle = AdsFeatureToggle(remoteConfig, userDatabase),
                 articlesFeatureToggle = ArticlesFeatureToggle(remoteConfig, userDatabase),
@@ -224,11 +189,10 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
                     openAccount()
                     return@setOnClickListener
                 }
-                val googleSignInOptions =
-                    GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken("666377868857-6b3mldm7i4d3ppvv5u865aufhc90suu2.apps.googleusercontent.com")
-                        .requestEmail()
-                        .build()
+                val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken("666377868857-6b3mldm7i4d3ppvv5u865aufhc90suu2.apps.googleusercontent.com")
+                    .requestEmail()
+                    .build()
 
                 val googleClient = GoogleSignIn.getClient(context, googleSignInOptions)
                 val googleIntent = googleClient.signInIntent
@@ -246,14 +210,11 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         weatherData = view.findViewById(R.id.main_weather_container_data)
         weatherLoading = view.findViewById(R.id.main_weather_container_loader)
         weatherError = view.findViewById(R.id.main_weather_container_error)
-
         currencyList = view.findViewById(R.id.main_currency_container_list)
         rubToUsd = view.findViewById(R.id.main_rub_to_usd_currency)
         rubToEur = view.findViewById(R.id.main_rub_to_eur_currency)
         currencyLoader = view.findViewById(R.id.main_currency_container_loader)
         currencyError = view.findViewById(R.id.main_currency_container_error)
-        currencyButton = view.findViewById(R.id.main_currency_button)
-        currencyButton.setOnClickListener { openCurrencyList() }
 
         articlesContainer = view.findViewById(R.id.main_articles_container)
         articlesList = view.findViewById(R.id.main_articles_list)
@@ -262,8 +223,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         articlesList.adapter = articlesAdapter
 
         cameraView = view.findViewById(R.id.main_camera_view)
-        displayManager =
-            cameraView.context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+        displayManager = cameraView.context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
         displayManager.registerDisplayListener(displayListener, null)
         cameraView.post {
             displayId = cameraView.display.displayId
@@ -298,10 +258,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
 
     private fun setupCamera() {
         when {
-            ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED -> {
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED -> {
                 val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
                 cameraProviderFuture.addListener(
                     Runnable {
@@ -313,10 +270,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
                 )
             }
 
-            ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_DENIED ->
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ->
                 requestCamera.launch(Manifest.permission.CAMERA)
 
             shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) ->
@@ -328,8 +282,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         val metrics = DisplayMetrics().also { cameraView.display.getRealMetrics(it) }
         val screenAspectRatio = aspectRatio(metrics.widthPixels, metrics.heightPixels)
         val rotation = cameraView.display.rotation
-        val cameraProvider =
-            cameraProvider ?: throw IllegalStateException("Camera initialization failed.")
+        val cameraProvider = cameraProvider ?: throw IllegalStateException("Camera initialization failed.")
         val cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
         previewUseCase = Preview.Builder()
             .setTargetAspectRatio(screenAspectRatio)
@@ -343,8 +296,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
             .apply { setAnalyzer(executor, faceAnalyzer()) }
         cameraProvider.unbindAll()
         try {
-            camera =
-                cameraProvider.bindToLifecycle(this, cameraSelector, previewUseCase, imageAnalyzer)
+            camera = cameraProvider.bindToLifecycle(this, cameraSelector, previewUseCase, imageAnalyzer)
             previewUseCase?.setSurfaceProvider(cameraView.surfaceProvider)
         } catch (exc: Exception) {
             android.util.Log.e("MainFragment", "Camera error", exc)
@@ -381,52 +333,48 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
             MainViewModel.WeatherState.Disabled -> weatherContainer.isVisible = false
         }
 
-    private fun applyCurrencyState(currencyState: MainViewModel.CurrencyState) =
-        when (currencyState) {
-            is MainViewModel.CurrencyState.Success -> {
-                currencyList.isVisible = true
-                currencyLoader.isVisible = false
-                currencyError.hide()
+    private fun applyCurrencyState(currencyState: MainViewModel.CurrencyState) = when (currencyState) {
+        is MainViewModel.CurrencyState.Success -> {
+            currencyList.isVisible = true
+            currencyLoader.isVisible = false
+            currencyError.hide()
 
-                rubToUsd.text =
-                    getString(R.string.main_currency_usd, currencyState.exchangeRates.usdRate)
-                rubToEur.text =
-                    getString(R.string.main_currency_eur, currencyState.exchangeRates.eurRate)
-            }
-            is MainViewModel.CurrencyState.Loading -> {
-                currencyList.isVisible = false
-                currencyLoader.isVisible = true
-                currencyError.hide()
-            }
-            is MainViewModel.CurrencyState.Error -> {
-                currencyList.isVisible = false
-                currencyLoader.isVisible = false
-                currencyError.show(retryAction = { viewModel.loadCurrency() })
-            }
-            MainViewModel.CurrencyState.Disabled -> currencyList.isVisible = false
+            rubToUsd.text = getString(R.string.main_currency_usd, currencyState.exchangeRates.usdRate)
+            rubToEur.text = getString(R.string.main_currency_eur, currencyState.exchangeRates.eurRate)
         }
-
-    private fun applyArticlesState(articlesState: MainViewModel.ArticlesState) =
-        when (articlesState) {
-            is MainViewModel.ArticlesState.Error -> {
-                articlesList.isVisible = false
-                articlesLoader.isVisible = false
-                articlesError.show(retryAction = { viewModel.loadArticles() })
-            }
-            is MainViewModel.ArticlesState.Loading -> {
-                articlesList.isVisible = false
-                articlesLoader.isVisible = true
-                articlesError.hide()
-            }
-            is MainViewModel.ArticlesState.Success -> {
-                articlesList.isVisible = true
-                articlesLoader.isVisible = false
-                articlesError.hide()
-
-                articlesAdapter.submitList(articlesState.articles)
-            }
-            MainViewModel.ArticlesState.Disabled -> articlesContainer.isVisible = false
+        is MainViewModel.CurrencyState.Loading -> {
+            currencyList.isVisible = false
+            currencyLoader.isVisible = true
+            currencyError.hide()
         }
+        is MainViewModel.CurrencyState.Error -> {
+            currencyList.isVisible = false
+            currencyLoader.isVisible = false
+            currencyError.show(retryAction = { viewModel.loadCurrency() })
+        }
+        MainViewModel.CurrencyState.Disabled -> currencyList.isVisible = false
+    }
+
+    private fun applyArticlesState(articlesState: MainViewModel.ArticlesState) = when (articlesState) {
+        is MainViewModel.ArticlesState.Error -> {
+            articlesList.isVisible = false
+            articlesLoader.isVisible = false
+            articlesError.show(retryAction = { viewModel.loadArticles() })
+        }
+        is MainViewModel.ArticlesState.Loading -> {
+            articlesList.isVisible = false
+            articlesLoader.isVisible = true
+            articlesError.hide()
+        }
+        is MainViewModel.ArticlesState.Success -> {
+            articlesList.isVisible = true
+            articlesLoader.isVisible = false
+            articlesError.hide()
+
+            articlesAdapter.submitList(articlesState.articles)
+        }
+        MainViewModel.ArticlesState.Disabled -> articlesContainer.isVisible = false
+    }
 
     private fun applyCameraState(cameraState: MainViewModel.CameraState) = when (cameraState) {
         MainViewModel.CameraState.Visible -> cameraView.isVisible = true
@@ -463,7 +411,6 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
             )
         }
     }
-
     @SuppressLint("UnsafeOptInUsageError")
     private fun faceAnalyzer(): ImageAnalysis.Analyzer {
         val highAccuracyOptions = FaceDetectorOptions.Builder()
@@ -501,8 +448,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
             // If face tracking was enabled:
             val trackingId = face.trackingId
 
-            android.util.Log.d(
-                "FaceAnalyzer", """
+            android.util.Log.d("FaceAnalyzer", """
                 Face was detected!
                 face ID: $trackingId
                 bounds: $bounds
@@ -511,8 +457,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
                 smiling: $smilingProbability
                 leftEye: $leftEyeOpenProbability
                 rightEye: $rightEyeOpenProbability
-            """.trimIndent()
-            )
+            """.trimIndent())
 
             if (lastFaceData.trackingId != trackingId) {
                 lastFaceData = lastFaceData.copy(
@@ -537,17 +482,10 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         return ImageAnalysis.Analyzer { imageProxy: ImageProxy ->
             val mediaImage = imageProxy.image
             if (mediaImage != null) {
-                val image =
-                    InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+                val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
                 detector.process(image)
                     .addOnSuccessListener { facesJob(it) }
-                    .addOnFailureListener {
-                        android.util.Log.e(
-                            "FaceAnalyzer",
-                            "failure listener",
-                            it
-                        )
-                    }
+                    .addOnFailureListener { android.util.Log.e("FaceAnalyzer", "failure listener", it) }
                     .addOnCompleteListener { imageProxy.close() }
             }
         }
@@ -566,6 +504,14 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
             ?.beginTransaction()
             ?.addToBackStack(null)
             ?.replace(R.id.fragment_container_view, CurrencyFragment.newInstance())
+            ?.commit()
+    }
+
+    private fun openWeather() {
+        activity?.supportFragmentManager
+            ?.beginTransaction()
+            ?.addToBackStack(null)
+            ?.replace(R.id.fragment_container_view, WeatherFragment.newInstance())
             ?.commit()
     }
 
