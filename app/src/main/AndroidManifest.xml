@@ -15,6 +15,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartMirror">
+        <activity
+            android:name=".ui.weather.WeatherActivity"
+            android:exported="false" />
         <!-- Banner: ca-app-pub-7136917781275978/7644983313 -->
         <!-- Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713 -->
         <!-- Our AdMob app ID: ca-app-pub-7136917781275978~7269578791 -->
@@ -26,14 +29,16 @@
             android:name=".MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize"
-            android:theme="@style/Theme.SmartMirror.NoActionBar">
+            android:theme="@style/Theme.SmartMirror.NoActionBar"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
 
         <activity
             android:name=".ui.debug.PreferenceActivity"
