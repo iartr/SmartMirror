@@ -23,6 +23,12 @@ android {
     def props = new Properties()
     props.load(new FileInputStream(rootProject.file("local.properties")))
     signingConfigs {
+        debug {
+            storeFile file('smartmirror.jks')
+            storePassword 'fumepa07'
+            keyAlias 'smartmirror'
+            keyPassword 'fumepa07'
+        }
         release {
             storeFile file("SmartMirrorKey.keystore")
             storePassword props['signing.password']
@@ -32,6 +38,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
         release {
             signingConfig signingConfigs.release
             minifyEnabled false
