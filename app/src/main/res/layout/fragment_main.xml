@@ -74,24 +74,27 @@
             android:id="@+id/main_currency_container_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/main_rub_to_usd_currency"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 tools:text="1 USD = X руб." />
 
             <TextView
                 android:id="@+id/main_rub_to_eur_currency"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:layout_marginTop="4dp"
                 tools:text="1 EUR = X руб." />
+
+            <Button
+                android:id="@+id/main_currency_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Все валюты" />
 
         </LinearLayout>
 
