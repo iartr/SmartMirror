@@ -13,20 +13,21 @@ class CurrencyListViewModel(
     private val currencyRateRepository: ICurrencyRateRepository
 ) : BaseViewModel() {
 
-    private val _currencyRatesState =
+    private val currencyRatesStateMutable =
         BehaviorSubject.createDefault<CurrencyRatesState>(CurrencyRatesState.Nothing)
-    val currencyRatesState: Observable<CurrencyRatesState> = _currencyRatesState.distinctUntilChanged()
+    val currencyRatesState: Observable<CurrencyRatesState> =
+        currencyRatesStateMutable.distinctUntilChanged()
 
     fun getLatestCurrencyRates() = currencyRateRepository.getLatestCurrencyRates()
-        .doOnSubscribe { _currencyRatesState.onNext(CurrencyRatesState.Loading) }
-        .doOnError { _currencyRatesState.onNext(CurrencyRatesState.Error) }
-        .subscribeSuccess { _currencyRatesState.onNext(CurrencyRatesState.Success(it)) }
+        .doOnSubscribe { currencyRatesStateMutable.onNext(CurrencyRatesState.Loading) }
+        .doOnError { currencyRatesStateMutable.onNext(CurrencyRatesState.Error) }
+        .subscribeSuccess { currencyRatesStateMutable.onNext(CurrencyRatesState.Success(it)) }
         .addTo(disposables)
 
     sealed interface CurrencyRatesState {
         data class Success(val currencyRates: List<CurrencyRate>) : CurrencyRatesState
         object Nothing : CurrencyRatesState
-        object Loading: CurrencyRatesState
+        object Loading : CurrencyRatesState
         object Error : CurrencyRatesState
     }
 

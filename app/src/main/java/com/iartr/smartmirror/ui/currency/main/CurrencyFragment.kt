@@ -26,8 +26,8 @@ class CurrencyFragment : BaseFragment(R.layout.fragment_currency) {
         pages.adapter = PagerAdapter(this)
         TabLayoutMediator(tabs, pages) { tab, index ->
             tab.text = when(index) {
-                1 -> "История"
-                else -> "Текущие"
+                1 -> getString(R.string.history)
+                else -> getString(R.string.current)
             }
         }.attach()
     }

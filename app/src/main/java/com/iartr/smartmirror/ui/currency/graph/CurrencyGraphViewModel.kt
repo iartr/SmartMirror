@@ -13,15 +13,16 @@ class CurrencyGraphViewModel(
     private val currencyRateRepository: ICurrencyRateRepository
 ) : BaseViewModel() {
 
-    private val _currencyRatesState =
+    private val currencyRatesStateMutable =
         BehaviorSubject.createDefault<CurrencyRatesState>(CurrencyRatesState.Nothing)
-    val currencyRatesState: Observable<CurrencyRatesState> = _currencyRatesState.distinctUntilChanged()
+    val currencyRatesState: Observable<CurrencyRatesState> =
+        currencyRatesStateMutable.distinctUntilChanged()
 
     fun getTimeseriesCurrencyRates(currency: Currency) {
         currencyRateRepository.getTimeseriesRates(currency)
-            .doOnSubscribe { _currencyRatesState.onNext(CurrencyRatesState.Loading) }
-            .doOnError { _currencyRatesState.onNext(CurrencyRatesState.Error(currency)) }
-            .subscribeSuccess { _currencyRatesState.onNext(CurrencyRatesState.Success(it)) }
+            .doOnSubscribe { currencyRatesStateMutable.onNext(CurrencyRatesState.Loading) }
+            .doOnError { currencyRatesStateMutable.onNext(CurrencyRatesState.Error(currency)) }
+            .subscribeSuccess { currencyRatesStateMutable.onNext(CurrencyRatesState.Success(it)) }
             .addTo(disposables)
     }
 
