@@ -247,7 +247,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         weatherData = view.findViewById(R.id.main_weather_container_data)
         weatherLoading = view.findViewById(R.id.main_weather_container_loader)
         weatherError = view.findViewById(R.id.main_weather_container_error)
-
+        weatherContainer.apply { setOnClickListener { openWeather() } }
         currencyList = view.findViewById(R.id.main_currency_container_list)
         rubToUsd = view.findViewById(R.id.main_rub_to_usd_currency)
         rubToEur = view.findViewById(R.id.main_rub_to_eur_currency)
@@ -578,7 +578,6 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
             ?.replace(R.id.fragment_container_view, CurrencyFragment.newInstance())
             ?.commit()
     }
-
     private companion object {
         private const val RATIO_4_3_VALUE = 4.0 / 3.0
         private const val RATIO_16_9_VALUE = 16.0 / 9.0
