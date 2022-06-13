@@ -34,7 +34,7 @@ class CurrencyRateRepository(
         ).map { jsonString ->
             val jsonObject = JSONObject(jsonString).getJSONObject("rates")
             val timeseries = arrayListOf<DataPoint>()
-            (0..364).map {
+            (0..365).map {
                 timeseries.add(
                     DataPoint(
                         calendar.time,

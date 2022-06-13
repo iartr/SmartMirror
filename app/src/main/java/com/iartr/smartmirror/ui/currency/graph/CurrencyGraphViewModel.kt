@@ -3,7 +3,6 @@ package com.iartr.smartmirror.ui.currency.graph
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.iartr.smartmirror.data.currency_rate.Currency
-import com.iartr.smartmirror.data.currency_rate.CurrencyRateTimeSeries
 import com.iartr.smartmirror.data.currency_rate.ICurrencyRateRepository
 import com.iartr.smartmirror.ui.base.BaseViewModel
 import com.iartr.smartmirror.utils.subscribeSuccess
