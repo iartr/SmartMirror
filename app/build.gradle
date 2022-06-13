@@ -34,11 +34,6 @@ android {
             storePassword props['signing.password']
             keyAlias props['signing.alias']
             keyPassword props['signing.password']
-        common {
-            storeFile file(var)
-            storePassword '1234567'
-            keyAlias 'AndroidApp'
-            keyPassword '1234567'
         }
     }
 

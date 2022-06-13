@@ -35,4 +35,19 @@
     <string name="account_weather_enabled">Погода включена?</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="getLocation">Для отображения погоды, включите геолокацию</string>
+    <string name="cityNotFound">Город не найден</string>
+    <string name="enterCityName">Введите название города</string>
+    <string name="week">Неделя</string>
+    <string name="day">День</string>
+    <string name="hourMinute">HH:mm</string>
+    <string name="fullTimeWeather">yyyy-mm-dd hh:mm</string>
+    <string name="dateWeather">yyyy-mm-dd</string>
+    <string name="reverseDateWeather">dd-mm-yyyy</string>
+    <string name="timeItem">Время:</string>
+    <string name="dateItem">Дата:</string>
+    <string name="tempItem">Погода:</string>
+    <string name="noDataWeather">Нет данных</string>
+    <string name="windSpeed">Скорость ветра (м/с)</string>
+    <string name="humidity">Влажность</string>
 </resources>
