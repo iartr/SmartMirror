@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="getLocation">Для отображения погоды, включите геолокацию</string>
+    <string name="cityNotFound">Город не найден</string>
+    <string name="enterCityName">Введите название города</string>
+    <string name="week">Неделя</string>
+    <string name="day">День</string>
+    <string name="hourMinute">HH:mm</string>
+    <string name="fullTimeWeather">yyyy-mm-dd hh:mm</string>
+    <string name="dateWeather">yyyy-mm-dd</string>
+    <string name="reverseDateWeather">dd-mm-yyyy</string>
+</resources>

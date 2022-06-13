@@ -23,20 +23,28 @@ android {
     def props = new Properties()
     props.load(new FileInputStream(rootProject.file("local.properties")))
     signingConfigs {
-        common {
-            storeFile file(var)
-            storePassword '1234567'
-            keyAlias 'AndroidApp'
-            keyPassword '1234567'
+        debug {
+            storeFile file("smartKey.jks")
+            storePassword '3232Vcxz'
+            keyAlias 'smartMirrorKey'
+            keyPassword '3232Vcxz'
+        }
+        release{
+            storeFile file("SmartMirrorKey.keystore")
+            storePassword props['signing.password']
+            keyAlias props['signing.alias']
+            keyPassword props['signing.password']
         }
     }
 
     buildTypes {
         debug {
-            signingConfig signingConfigs.common
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         release {
-            signingConfig signingConfigs.common
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -147,4 +155,7 @@ dependencies {
 
     //Weather API
     implementation "com.android.volley:volley:1.2.1"
+    implementation "com.google.android.gms:play-services-location:20.0.0"
+    implementation "com.squareup.picasso:picasso:2.71828"
+
 }

@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraint"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:backgroundTintMode="add"
+    tools:context=".ui.weather.WeatherFragment">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:src="@drawable/background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/tabLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp">
+
+            <EditText
+                android:id="@+id/editCity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:ems="10"
+                android:hint="Город"
+                android:inputType="textShortMessage"
+                android:minHeight="48dp"
+                android:textAlignment="center" />
+
+            <Button
+                android:id="@+id/searchButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="#3F51B5"
+                android:text="Поиск" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="10dp">
+
+            <TextView
+                android:id="@+id/city"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:shadowColor="#4D000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:textAlignment="center"
+                android:textColor="#33000000"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/localtime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:shadowColor="#4D000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:textAlignment="center"
+                android:textColor="#33000000" />
+
+            <TextView
+                android:id="@+id/currentTemp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:shadowColor="#9A000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:text="@string/noDataWeather"
+                android:textAlignment="center"
+                android:textColor="#FFFFFF"
+                android:textSize="40sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/imageTemp"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:id="@+id/infoText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:foregroundGravity="center"
+                android:gravity="center"
+                android:shadowColor="#4D000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:textColor="#33000000"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textView3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:foregroundGravity="center"
+                        android:gravity="center"
+                        android:shadowColor="#66000000"
+                        android:shadowDx="1"
+                        android:shadowDy="1"
+                        android:shadowRadius="1"
+                        android:text="@string/windSpeed"
+                        android:textColor="#33000000"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/windSpeed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:foregroundGravity="center"
+                        android:gravity="center"
+                        android:shadowColor="#99000000"
+                        android:shadowDx="1"
+                        android:shadowDy="1"
+                        android:shadowRadius="1"
+                        android:text="@string/noDataWeather"
+                        android:textColor="#FFFFFF"
+                        android:textSize="25sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textView5"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:foregroundGravity="center"
+                        android:gravity="center"
+                        android:shadowColor="#66000000"
+                        android:shadowDx="1"
+                        android:shadowDy="1"
+                        android:shadowRadius="1"
+                        android:text="@string/humidity"
+                        android:textColor="#33000000"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/humidity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:foregroundGravity="center"
+                        android:gravity="center"
+                        android:shadowColor="#99000000"
+                        android:shadowDx="1"
+                        android:shadowDy="1"
+                        android:shadowRadius="1"
+                        android:text="@string/noDataWeather"
+                        android:textColor="#FFFFFF"
+                        android:textSize="25sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:contextClickable="false"
+        android:elevation="2dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tabIndicatorColor="#3F51B5"
+        app:tabSelectedTextColor="#FFFFFF"
+        app:tabTextAppearance="@style/TabLayoutTextStyle"
+        app:tabTextColor="#222196F3">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="День" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Неделя" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/placeholder"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tabLayout" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
