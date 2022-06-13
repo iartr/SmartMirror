@@ -8,4 +8,6 @@
     <dimen name="button_padding_left">16dp</dimen>
     <dimen name="button_padding_right">16dp</dimen>
     <dimen name="button_padding_top">6.5dp</dimen>
+
+    <dimen name="vertical_space">8dp</dimen>
 </resources>

@@ -30,6 +30,12 @@ android {
             keyPassword '3232Vcxz'
         }
         release{
+            storeFile file('smartmirror.jks')
+            storePassword 'fumepa07'
+            keyAlias 'smartmirror'
+            keyPassword 'fumepa07'
+        }
+        release {
             storeFile file("SmartMirrorKey.keystore")
             storePassword props['signing.password']
             keyAlias props['signing.alias']
@@ -53,6 +59,7 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
+        coreLibraryDesugaringEnabled true
     }
     
     kotlinOptions {
@@ -67,6 +74,8 @@ android {
 }
 
 dependencies {
+
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
@@ -123,6 +132,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.1.0'
 
     // https://github.com/bumptech/glide
     implementation 'com.github.bumptech.glide:glide:4.13.0'
@@ -157,5 +167,7 @@ dependencies {
     implementation "com.android.volley:volley:1.2.1"
     implementation "com.google.android.gms:play-services-location:20.0.0"
     implementation "com.squareup.picasso:picasso:2.71828"
-
+    
+    // Graphs for currency rates
+    implementation 'com.jjoe64:graphview:4.2.2'
 }
