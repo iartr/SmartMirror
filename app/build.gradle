@@ -41,10 +41,10 @@ android {
                 envPass = props['signing.pas']
             }
 
-            storeFile file("SmartMirrorKey.keystore")
-            storePassword envPass
-            keyAlias envAlias
-            keyPassword envPass
+            storeFile = file("SmartMirrorKey.keystore")
+            storePassword = envPass
+            keyAlias = envAlias
+            keyPassword = envPass
         }
     }
 
