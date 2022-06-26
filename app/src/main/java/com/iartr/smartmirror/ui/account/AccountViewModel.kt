@@ -51,6 +51,7 @@ class AccountViewModel : BaseViewModel() {
 
     init {
         accountRepository.addAuthStateListener(authListener)
+        loadFeatures()
     }
 
     override fun onCleared() {

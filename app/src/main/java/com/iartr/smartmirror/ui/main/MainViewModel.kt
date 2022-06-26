@@ -1,34 +1,49 @@
 package com.iartr.smartmirror.ui.main
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import android.content.Intent
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.iartr.smartmirror.BuildConfig
 import com.iartr.smartmirror.data.articles.Article
+import com.iartr.smartmirror.data.articles.ArticlesRepository
 import com.iartr.smartmirror.data.articles.IArticlesRepository
+import com.iartr.smartmirror.data.articles.newsApi
+import com.iartr.smartmirror.data.coord.CoordRepository
+import com.iartr.smartmirror.data.coord.coordApi
+import com.iartr.smartmirror.data.currency.CurrencyRepository
 import com.iartr.smartmirror.data.currency.ExchangeRates
 import com.iartr.smartmirror.data.currency.ICurrencyRepository
+import com.iartr.smartmirror.data.currency.currencyApi
 import com.iartr.smartmirror.data.weather.IWeatherRepository
-import com.iartr.smartmirror.toggles.CameraFeatureToggle
-import com.iartr.smartmirror.toggles.FeatureToggle
+import com.iartr.smartmirror.data.weather.WeatherRepository
+import com.iartr.smartmirror.data.weather.weatherApi
+import com.iartr.smartmirror.ui.account.AccountRepository
+import com.iartr.smartmirror.ui.account.FeaturesRepository
+import com.iartr.smartmirror.ui.base.BaseRouter
 import com.iartr.smartmirror.ui.base.BaseViewModel
+import com.iartr.smartmirror.utils.ConsumableStream
 import com.iartr.smartmirror.utils.subscribeSuccess
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 
-class MainViewModel(
-    private val weatherRepository: IWeatherRepository,
-    private val currencyRepository: ICurrencyRepository,
-    private val articlesRepository: IArticlesRepository,
-    private val cameraFeatureToggle: FeatureToggle,
-    private val accountFeatureToggle: FeatureToggle,
-    private val adsFeatureToggle: FeatureToggle,
-    private val articlesFeatureToggle: FeatureToggle,
-    private val currencyFeatureToggle: FeatureToggle,
-    private val weatherFeatureToggle: FeatureToggle
-) : BaseViewModel() {
+class MainViewModel : BaseViewModel() {
+    // DI
+    private val weatherRepository: IWeatherRepository = WeatherRepository(
+        api = weatherApi,
+        coordRepository = CoordRepository(coordApi = coordApi)
+    )
+    private val currencyRepository: ICurrencyRepository = CurrencyRepository(api = currencyApi)
+    private val articlesRepository: IArticlesRepository = ArticlesRepository(api = newsApi)
+    private val featureRepository: FeaturesRepository = FeaturesRepository()
+    private val accountRepository: AccountRepository = AccountRepository()
+    override val router = MainRouter()
+    // DI
+
     private val weatherStateMutable = BehaviorSubject.createDefault<WeatherState>(WeatherState.Loading)
     val weatherState: Observable<WeatherState> = weatherStateMutable.distinctUntilChanged()
 
@@ -40,6 +55,15 @@ class MainViewModel(
 
     private val cameraStateMutable = BehaviorSubject.createDefault<CameraState>(CameraState.Hide)
     val cameraState: Observable<CameraState> = cameraStateMutable.distinctUntilChanged()
+
+    private val isAccountVisibleMutable = BehaviorSubject.createDefault(true)
+    val isAccountVisible: Observable<Boolean> = isAccountVisibleMutable.distinctUntilChanged()
+
+    private val isAdVisibleMutable = BehaviorSubject.createDefault(true)
+    val isAdVisible: Observable<Boolean> = isAdVisibleMutable.distinctUntilChanged()
+
+    private val googleAuthSignalMutable = ConsumableStream<Unit>()
+    val googleAuthSignal: Observable<Unit> = googleAuthSignalMutable.observe()
 
     val adListener: AdListener = object : AdListener() {
         override fun onAdFailedToLoad(p0: LoadAdError) {
@@ -58,10 +82,13 @@ class MainViewModel(
         loadCurrency()
         loadArticles()
         loadCameraState()
+        loadAdState()
+        loadAccountState()
     }
 
     fun loadWeather() {
-        weatherFeatureToggle.isActive().zipWith(weatherRepository.getCurrentWeather(), { t1, t2 -> t1 to t2 })
+        featureRepository.isEnabled(FeaturesRepository.FeatureSet.WEATHER)
+            .zipWith(weatherRepository.getCurrentWeather(), { t1, t2 -> t1 to t2 })
             .doOnSubscribe { weatherStateMutable.onNext(WeatherState.Loading) }
             .doOnError { weatherStateMutable.onNext(WeatherState.Error) }
             .subscribeSuccess { (isActive, weather) ->
@@ -79,7 +106,8 @@ class MainViewModel(
     }
 
     fun loadCurrency() {
-        currencyFeatureToggle.isActive().zipWith(currencyRepository.getCurrencyExchangeRub(), { t1, t2 -> t1 to t2 })
+        featureRepository.isEnabled(FeaturesRepository.FeatureSet.CURRENCY)
+            .zipWith(currencyRepository.getCurrencyExchangeRub(), { t1, t2 -> t1 to t2 })
             .doOnSubscribe { currencyStateMutable.onNext(CurrencyState.Loading) }
             .doOnError { currencyStateMutable.onNext(CurrencyState.Error) }
             .subscribeSuccess { (isActive, exchangeRate) ->
@@ -94,7 +122,8 @@ class MainViewModel(
     }
 
     fun loadArticles() {
-        articlesFeatureToggle.isActive().zipWith(articlesRepository.getLatest(), { t1, t2 -> t1 to t2 })
+        featureRepository.isEnabled(FeaturesRepository.FeatureSet.ARTICLES)
+            .zipWith(articlesRepository.getLatest(), { t1, t2 -> t1 to t2 })
             .doOnSubscribe { articlesStateMutable.onNext(ArticlesState.Loading) }
             .doOnError { articlesStateMutable.onNext(ArticlesState.Error) }
             .subscribeSuccess { (isActive, articles) ->
@@ -109,10 +138,22 @@ class MainViewModel(
     }
 
     fun loadCameraState() {
-        cameraFeatureToggle.isActive()
+        featureRepository.isEnabled(FeaturesRepository.FeatureSet.CAMERA)
             .subscribeSuccess { isActive ->
                 cameraStateMutable.onNext(if (isActive) CameraState.Visible else CameraState.Hide)
             }
+            .addTo(disposables)
+    }
+
+    fun loadAdState() {
+        featureRepository.isEnabled(FeaturesRepository.FeatureSet.ADS)
+            .subscribeSuccess { isAdVisibleMutable.onNext(it) }
+            .addTo(disposables)
+    }
+
+    fun loadAccountState() {
+        featureRepository.isEnabled(FeaturesRepository.FeatureSet.ACCOUNT)
+            .subscribeSuccess { isAccountVisibleMutable.onNext(it) }
             .addTo(disposables)
     }
 
@@ -129,7 +170,21 @@ class MainViewModel(
     }
 
     fun onAccountButtonLongClickListener() {
+        router.openDebug()
+    }
 
+    fun onAccountButtonClick() {
+        if (accountRepository.isLoggedIn()) {
+            router.openAccount()
+            return
+        }
+        googleAuthSignalMutable.push(Unit)
+    }
+
+    fun onGoogleAuthResult(data: Intent?) {
+        accountRepository.authByGoogle(data)
+            .subscribeSuccess { router.openAccount() }
+            .addTo(disposables)
     }
 
     sealed interface WeatherState {
@@ -157,21 +212,5 @@ class MainViewModel(
         object Visible : CameraState
         object NotAvailable : CameraState
         object Hide : CameraState
-    }
-
-    class Factory(
-        private val weatherRepository: IWeatherRepository,
-        private val currencyRepository: ICurrencyRepository,
-        private val articlesRepository: IArticlesRepository,
-        private val cameraFeatureToggle: FeatureToggle,
-        private val accountFeatureToggle: FeatureToggle,
-        private val adsFeatureToggle: FeatureToggle,
-        private val articlesFeatureToggle: FeatureToggle,
-        private val currencyFeatureToggle: FeatureToggle,
-        private val weatherFeatureToggle: FeatureToggle
-    ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return MainViewModel(weatherRepository, currencyRepository, articlesRepository, cameraFeatureToggle, accountFeatureToggle, adsFeatureToggle, articlesFeatureToggle, currencyFeatureToggle, weatherFeatureToggle) as T
-        }
     }
 }

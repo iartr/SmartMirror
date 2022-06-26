@@ -1,6 +1,7 @@
 package com.iartr.smartmirror.ui.base
 
 import android.app.Activity
+import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -16,6 +17,12 @@ open class BaseRouter {
         return currentActivity?.let(action)
     }
 
+    protected fun openActivity(activityClass: Class<out Activity>) {
+        withActivity {
+            it.startActivity(Intent(it, activityClass))
+        }
+    }
+
     protected fun openFragment(fragment: Fragment) {
         withActivity {
             val fm = it.supportFragmentManager
@@ -24,6 +31,7 @@ open class BaseRouter {
             }
 
             fm.beginTransaction()
+                .addToBackStack(null)
                 .replace(R.id.fragment_container_view, fragment)
                 .commit()
         }
