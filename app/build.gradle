@@ -21,7 +21,7 @@ android {
     }
 
     def props = new Properties()
-    props.load(new FileInputStream(rootProject.file("local.properties")))
+    props.load(new FileInputStream(rootProject.file("./local.properties")))
     signingConfigs {
         debug {
             storeFile file("DebugKeystore.keystore")
