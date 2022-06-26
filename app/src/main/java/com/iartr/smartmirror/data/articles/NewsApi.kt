@@ -1,5 +1,6 @@
 package com.iartr.smartmirror.data.articles
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.core.Single
 import retrofit2.Retrofit
@@ -15,12 +16,14 @@ private val retrofit = Retrofit.Builder()
     .build()
 val newsApi: NewsApi = retrofit.create(NewsApi::class.java)
 
+@Keep
 data class GetEverythingResponse(
     val status: String,
     val totalResults: Int,
     val articles: List<Article>
 )
 
+@Keep
 data class Article(
     @SerializedName("source") val source: Any?,
     @SerializedName("author") val author: String?,

@@ -1,6 +1,7 @@
 package com.iartr.smartmirror.ui.account
 
 import android.content.SharedPreferences
+import androidx.annotation.Keep
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.google.firebase.auth.ktx.auth
@@ -46,6 +47,7 @@ class FeaturesRepository {
         }
     }
 
+    @Keep
     enum class FeatureSet(val asString: String, val defaultEnabled: Boolean) {
         WEATHER("feature_weather_enabled", true),
         CURRENCY("feature_currency_enabled", true),

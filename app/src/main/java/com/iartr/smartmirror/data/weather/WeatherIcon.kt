@@ -1,7 +1,9 @@
 package com.iartr.smartmirror.data.weather
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
+@Keep
 enum class WeatherIcon {
     @SerializedName("01d")
     CLEAR_SKY,

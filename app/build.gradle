@@ -23,7 +23,13 @@ android {
     def props = new Properties()
     props.load(new FileInputStream(rootProject.file("local.properties")))
     signingConfigs {
-        common {
+        debug {
+            storeFile file("DebugKeystore.keystore")
+            storePassword "debugkey"
+            keyAlias "debug"
+            keyPassword "debugkey"
+        }
+        release {
             storeFile file("SmartMirrorKey.keystore")
             storePassword props['signing.password']
             keyAlias props['signing.alias']
@@ -33,11 +39,11 @@ android {
 
     buildTypes {
         debug {
-            signingConfig signingConfigs.common
+            signingConfig signingConfigs.debug
             minifyEnabled false
         }
         release {
-            signingConfig signingConfigs.common
+            signingConfig signingConfigs.release
             shrinkResources true
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -147,7 +153,4 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.0.5"
-
-    // Graphs for currency rates
-    implementation 'com.jjoe64:graphview:4.2.2'
 }

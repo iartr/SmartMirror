@@ -1,5 +1,6 @@
 package com.iartr.smartmirror.data.currency
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.core.Single
 import retrofit2.Retrofit
@@ -15,11 +16,13 @@ private val retrofit = Retrofit.Builder()
     .build()
 val currencyApi = retrofit.create(CurrencyApi::class.java)
 
+@Keep
 data class CurrencyResponse(
     @SerializedName("data")
     val data: CurrencyExchangeRates
 )
 
+@Keep
 data class CurrencyExchangeRates(
     @SerializedName("currency")
     val baseCurrency: CurrencyType,
@@ -27,6 +30,7 @@ data class CurrencyExchangeRates(
     val rates: ExchangeRates
 )
 
+@Keep
 data class ExchangeRates(
     @SerializedName("USD")
     val usdRate: Double,
