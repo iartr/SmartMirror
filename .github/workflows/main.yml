@@ -1,4 +1,4 @@
-name: CI
+name: CI debug
 
 on:
   push:
@@ -24,4 +24,4 @@ jobs:
           APP_SIGN_PASSWORD: ${{ secrets.APP_SIGN_PASSWORD }}
         run: touch ./local.properties
       - name: Build with Gradle
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleDebug
