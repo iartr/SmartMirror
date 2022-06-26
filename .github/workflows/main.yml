@@ -18,5 +18,12 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: ENV variables
+        env:
+          APP_SIGN_ALIAS: ${{ secrets.APP_SIGN_ALIAS }}
+          APP_SIGN_PASSWORD: ${{ secrets.APP_SIGN_PASSWORD }}
+        run: |
+          echo signing.alias=\"APP_SIGN_ALIAS\" > ./local.properties \
+          echo signing.password=\"APP_SIGN_PASSWORD\" > ./local.properties \
       - name: Build with Gradle
         run: ./gradlew assembleDebug
