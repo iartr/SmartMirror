@@ -24,6 +24,6 @@ jobs:
           APP_SIGN_PASSWORD: ${{ secrets.APP_SIGN_PASSWORD }}
         run: |
           echo signing.alias=\"APP_SIGN_ALIAS\" > ./local.properties
-          echo signing.pas=\"APP_SIGN_PASSWORD\" > ./local.properties
+          echo -e signing.pas=\"APP_SIGN_PASSWORD\" >> ./local.properties
       - name: Build with Gradle
         run: ./gradlew assembleRelease
