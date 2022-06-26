@@ -45,11 +45,9 @@ import com.iartr.smartmirror.data.currency.currencyApi
 import com.iartr.smartmirror.data.weather.WeatherRepository
 import com.iartr.smartmirror.data.weather.weatherApi
 import com.iartr.smartmirror.deviceid.DeviceIdProvider
-import com.iartr.smartmirror.toggles.*
 import com.iartr.smartmirror.ui.account.AccountFragment
 import com.iartr.smartmirror.ui.debug.PreferenceActivity
 import com.iartr.smartmirror.ui.base.BaseFragment
-import com.iartr.smartmirror.ui.currency.main.CurrencyFragment
 import com.iartr.smartmirror.ui.main.articles.ArticlesAdapter
 import com.iartr.smartmirror.utils.RetryingErrorView
 import com.iartr.smartmirror.utils.subscribeSuccess
@@ -253,7 +251,6 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         currencyLoader = view.findViewById(R.id.main_currency_container_loader)
         currencyError = view.findViewById(R.id.main_currency_container_error)
         currencyButton = view.findViewById(R.id.main_currency_button)
-        currencyButton.setOnClickListener { openCurrencyList() }
 
         articlesContainer = view.findViewById(R.id.main_articles_container)
         articlesList = view.findViewById(R.id.main_articles_list)
@@ -558,14 +555,6 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
             ?.beginTransaction()
             ?.addToBackStack(null)
             ?.replace(R.id.fragment_container_view, AccountFragment.newInstance())
-            ?.commit()
-    }
-
-    private fun openCurrencyList() {
-        activity?.supportFragmentManager
-            ?.beginTransaction()
-            ?.addToBackStack(null)
-            ?.replace(R.id.fragment_container_view, CurrencyFragment.newInstance())
             ?.commit()
     }
 
