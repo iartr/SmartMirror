@@ -8,13 +8,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import com.iartr.smartmirror.R
+import com.iartr.smartmirror.ui.base.BaseActivity
 import kotlin.system.exitProcess
 
-class PreferenceActivity : AppCompatActivity() {
+class PreferenceActivity : BaseActivity(R.layout.activity_preferences) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_preferences)
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()

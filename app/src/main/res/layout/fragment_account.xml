@@ -5,138 +5,131 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        tools:context=".ui.account.AccountFragment">
+        android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/account_toolbar"
+        <LinearLayout
+            android:id="@+id/account_content_root"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-            app:title="@string/account_title" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/account_photo"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/account_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
+                app:title="@string/account_title" />
+
+            <ImageView
+                android:id="@+id/account_photo"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginStart="16dp"
+                android:contentDescription="@string/account_photo_content_description"
+                tools:srcCompat="@tools:sample/avatars" />
+
+            <TextView
+                android:id="@+id/account_uid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                tools:text="@string/account_uid" />
+
+            <TextView
+                android:id="@+id/account_display_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                tools:text="@string/account_display_name" />
+
+            <TextView
+                android:id="@+id/account_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                tools:text="@string/account_email" />
+
+            <TextView
+                android:id="@+id/account_is_email_verified"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                tools:text="@string/account_email_is_verified" />
+
+            <TextView
+                android:id="@+id/account_phone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                tools:text="@string/account_phone" />
+
+            <CheckBox
+                android:id="@+id/account_camera_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/account_camera_enabled" />
+
+            <CheckBox
+                android:id="@+id/account_ads_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/account_ads_enabled" />
+
+            <CheckBox
+                android:id="@+id/account_articles_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/account_artices_enabled" />
+
+            <CheckBox
+                android:id="@+id/account_currencies_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/account_currencies_enabled" />
+
+            <CheckBox
+                android:id="@+id/account_weather_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/account_weather_enabled" />
+
+            <Button
+                android:id="@+id/account_sign_out_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/account_sign_out" />
+
+        </LinearLayout>
+
+        <com.iartr.smartmirror.utils.RetryingErrorView
+            android:id="@+id/account_content_retrying_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_marginStart="16dp"
-            android:contentDescription="@string/account_photo_content_description"
-            tools:srcCompat="@tools:sample/avatars" />
+            android:layout_marginEnd="16dp"
+            android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/account_uid"
+        <ProgressBar
+            android:id="@+id/account_progress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            tools:text="@string/account_uid" />
-
-        <TextView
-            android:id="@+id/account_display_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            tools:text="@string/account_display_name" />
-
-        <TextView
-            android:id="@+id/account_email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            tools:text="@string/account_email" />
-
-        <TextView
-            android:id="@+id/account_is_email_verified"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            tools:text="@string/account_email_is_verified" />
-
-        <TextView
-            android:id="@+id/account_metadata"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            tools:text="@string/account_metadata" />
-
-        <TextView
-            android:id="@+id/account_multifactor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            tools:text="@string/account_multifactor" />
-
-        <TextView
-            android:id="@+id/account_phone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            tools:text="@string/account_phone" />
-
-        <TextView
-            android:id="@+id/account_provider_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            tools:text="@string/account_provider_id" />
-
-        <TextView
-            android:id="@+id/account_tenat_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            tools:text="@string/account_tenat_id" />
-
-        <CheckBox
-            android:id="@+id/account_camera_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/account_camera_enabled" />
-
-        <CheckBox
-            android:id="@+id/account_ads_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/account_ads_enabled" />
-
-        <CheckBox
-            android:id="@+id/account_articles_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/account_artices_enabled" />
-
-        <CheckBox
-            android:id="@+id/account_currencies_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/account_currencies_enabled" />
-
-        <CheckBox
-            android:id="@+id/account_weather_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/account_weather_enabled" />
-
-        <Button
-            android:id="@+id/account_sign_out_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/account_sign_out" />
-
-    </LinearLayout>
+            android:layout_gravity="center"
+            android:visibility="gone" />
+    </FrameLayout>
 </ScrollView>

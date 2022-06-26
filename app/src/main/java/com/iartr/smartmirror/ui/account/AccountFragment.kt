@@ -1,146 +1,138 @@
 package com.iartr.smartmirror.ui.account
 
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.FragmentManager
+import androidx.core.content.ContextCompat
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.ktx.remoteConfig
+import com.google.android.material.color.MaterialColors
 import com.iartr.smartmirror.R
-import com.iartr.smartmirror.toggles.*
 import com.iartr.smartmirror.ui.base.BaseFragment
-import com.iartr.smartmirror.utils.subscribeSuccess
+import com.iartr.smartmirror.utils.RetryingErrorView
 
 class AccountFragment : BaseFragment(R.layout.fragment_account) {
 
-    private val firebaseAuthStateListener: FirebaseAuth.AuthStateListener = object : FirebaseAuth.AuthStateListener {
-        override fun onAuthStateChanged(auth: FirebaseAuth) {
-            // Right after the listener has been registered
-            // When a user is signed in
-            // When the current user is signed out
-            // When the current user changes
-
-            if (auth.currentUser == null) {
-                Toast.makeText(requireContext(), R.string.you_was_sign_out, Toast.LENGTH_SHORT).show()
-                back()
-            }
+    private lateinit var errorView: RetryingErrorView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var contentRoot: View
+    private lateinit var toolbar: Toolbar
+    private lateinit var photoIv: ImageView
+    private lateinit var uidTv: TextView
+    private lateinit var emailTv: TextView
+    private lateinit var isEmailVerifiedTv: TextView
+    private lateinit var displayNameTv: TextView
+    private lateinit var phoneTv: TextView
+    private lateinit var cameraCheckBox: CheckBox
+    private lateinit var adsCheckBox: CheckBox
+    private lateinit var articlesCheckBox: CheckBox
+    private lateinit var currencyCheckBox: CheckBox
+    private lateinit var weatherCheckBox: CheckBox
+    private lateinit var logoutButton: Button
+    private val errorAccountDrawable: Drawable? by lazy {
+        ContextCompat.getDrawable(requireContext(), R.drawable.ic_account_circle_outline_24)?.apply {
+            colorFilter = PorterDuffColorFilter(MaterialColors.getColor(requireView(), R.attr.background_highlighted), PorterDuff.Mode.SRC_ATOP)
         }
     }
-    private val firebaseAuth: FirebaseAuth = Firebase.auth
-    private val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
-    private val firebaseDatabase: DatabaseReference = Firebase.database.reference.child("${firebaseAuth.uid}")
 
-    // TODO: vm
-    private lateinit var cameraToggle: FeatureToggle
-    private lateinit var cameraCheckBox: CheckBox
-
-    private lateinit var adsToggle: FeatureToggle
-    private lateinit var adsCheckBox: CheckBox
-
-    private lateinit var articlesToggle: FeatureToggle
-    private lateinit var articlesCheckBox: CheckBox
-
-    private lateinit var currencyToggle: FeatureToggle
-    private lateinit var currencyCheckBox: CheckBox
-
-    private lateinit var weatherToggle: FeatureToggle
-    private lateinit var weatherCheckBox: CheckBox
+    override val viewModel: AccountViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        firebaseAuth.addAuthStateListener(firebaseAuthStateListener)
-        val user = firebaseAuth.currentUser ?: return
-
-        cameraToggle = CameraFeatureToggle(requireContext(), remoteConfig, firebaseDatabase)
-        adsToggle = AdsFeatureToggle(remoteConfig, firebaseDatabase)
-        articlesToggle = ArticlesFeatureToggle(remoteConfig, firebaseDatabase)
-        currencyToggle = CurrencyFeatureToggle(remoteConfig, firebaseDatabase)
-        weatherToggle = WeatherFeatureToggle(remoteConfig, firebaseDatabase)
-
-        view.findViewById<Toolbar>(R.id.account_toolbar).apply {
-            setNavigationOnClickListener { back() }
+        errorView = view.findViewById(R.id.account_content_retrying_view)
+        progressBar = view.findViewById(R.id.account_progress)
+        contentRoot = view.findViewById(R.id.account_content_root)
+        toolbar = view.findViewById<Toolbar>(R.id.account_toolbar).apply {
+            setNavigationOnClickListener { viewModel.onBack() }
         }
-        view.findViewById<ImageView>(R.id.account_photo).apply {
-            Glide.with(this).load(user.photoUrl).into(this)
-        }
-        view.findViewById<TextView>(R.id.account_uid).apply {
-            text = getString(R.string.account_uid, user.uid)
-        }
-        view.findViewById<TextView>(R.id.account_email).apply {
-            text = getString(R.string.account_email, user.email)
-        }
-        view.findViewById<TextView>(R.id.account_is_email_verified).apply {
-            text = getString(R.string.account_email_is_verified, user.isEmailVerified.toString())
-        }
-        view.findViewById<TextView>(R.id.account_display_name).apply {
-            text = getString(R.string.account_display_name, user.displayName)
-        }
-        view.findViewById<TextView>(R.id.account_phone).apply {
-            text = getString(R.string.account_phone, user.phoneNumber)
-        }
-        view.findViewById<TextView>(R.id.account_multifactor).apply {
-            text = getString(R.string.account_multifactor, user.multiFactor)
-        }
-        view.findViewById<TextView>(R.id.account_provider_id).apply {
-            text = getString(R.string.account_provider_id, user.providerId)
-        }
-        view.findViewById<TextView>(R.id.account_tenat_id).apply {
-            text = getString(R.string.account_tenat_id, user.tenantId)
-        }
+        photoIv = view.findViewById<ImageView>(R.id.account_photo)
+        uidTv = view.findViewById<TextView>(R.id.account_uid)
+        emailTv = view.findViewById<TextView>(R.id.account_email)
+        isEmailVerifiedTv = view.findViewById<TextView>(R.id.account_is_email_verified)
+        displayNameTv = view.findViewById<TextView>(R.id.account_display_name)
+        phoneTv = view.findViewById<TextView>(R.id.account_phone)
         cameraCheckBox = view.findViewById<CheckBox>(R.id.account_camera_checkbox).apply {
-//            isChecked = cameraToggle.isActive()
             setOnCheckedChangeListener { _, isChecked ->
-                cameraToggle.setActive(isChecked).subscribe()
+                viewModel.onCameraChecked(isChecked)
             }
         }
         adsCheckBox = view.findViewById<CheckBox>(R.id.account_ads_checkbox).apply {
-//            isChecked = adsToggle.isActive()
             setOnCheckedChangeListener { _, isChecked ->
-                adsToggle.setActive(isChecked).subscribe()
+                viewModel.onAdsChecked(isChecked)
             }
         }
         articlesCheckBox = view.findViewById<CheckBox>(R.id.account_articles_checkbox).apply {
-//            isChecked = articlesToggle.isActive()
             setOnCheckedChangeListener { _, isChecked ->
-                articlesToggle.setActive(isChecked).subscribe()
+                viewModel.onArticlesChecked(isChecked)
             }
         }
         currencyCheckBox = view.findViewById<CheckBox>(R.id.account_currencies_checkbox).apply {
-//            isChecked = currencyToggle.isActive()
             setOnCheckedChangeListener { _, isChecked ->
-                currencyToggle.setActive(isChecked).subscribe()
+                viewModel.onCurrencyChecked(isChecked)
             }
         }
         weatherCheckBox = view.findViewById<CheckBox>(R.id.account_weather_checkbox).apply {
-//            isChecked = weatherToggle.isActive()
             setOnCheckedChangeListener { _, isChecked ->
-                weatherToggle.setActive(isChecked).subscribe()
+                viewModel.onWeatherChecked(isChecked)
             }
         }
-        view.findViewById<Button>(R.id.account_sign_out_button).apply {
-            setOnClickListener { firebaseAuth.signOut() }
+        logoutButton = view.findViewById<Button>(R.id.account_sign_out_button).apply {
+            setOnClickListener { viewModel.onLogoutClicked() }
         }
 
-        cameraToggle.isActive().subscribeSuccess(cameraCheckBox::setChecked)
-        adsToggle.isActive().subscribeSuccess(adsCheckBox::setChecked)
-        articlesToggle.isActive().subscribeSuccess(articlesCheckBox::setChecked)
-        currencyToggle.isActive().subscribeSuccess(currencyCheckBox::setChecked)
-        weatherToggle.isActive().subscribeSuccess(weatherCheckBox::setChecked)
-    }
+        viewModel.viewState.subscribeWithFragment { state ->
+            when (state) {
+                is AccountViewModel.State.Content -> {
+                    contentRoot.isInvisible = false
+                    progressBar.isVisible = false
+                    errorView.hide()
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        firebaseAuth.removeAuthStateListener(firebaseAuthStateListener)
-    }
+                    Glide.with(this)
+                        .load(state.accountInfo.photoUrl)
+                        .placeholder(errorAccountDrawable)
+                        .fallback(errorAccountDrawable)
+                        .error(errorAccountDrawable)
+                        .into(photoIv)
 
-    private fun back() = activity?.supportFragmentManager?.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                    uidTv.text = state.accountInfo.uid
+                    displayNameTv.isVisible = state.accountInfo.displayName != null
+                    displayNameTv.text = state.accountInfo.displayName
+                    phoneTv.isVisible = state.accountInfo.phone != null
+                    phoneTv.text = state.accountInfo.phone
+                    emailTv.isVisible = state.accountInfo.email != null
+                    emailTv.text = state.accountInfo.email
+                    isEmailVerifiedTv.isVisible = state.accountInfo.email != null
+                    isEmailVerifiedTv.text = state.accountInfo.isEmailVerified.toString()
+
+                    cameraCheckBox.isChecked = state.features.isCameraEnabled
+                    adsCheckBox.isChecked = state.features.isAdsEnabled
+                    articlesCheckBox.isChecked = state.features.isArticlesEnabled
+                    weatherCheckBox.isChecked = state.features.isWeatherEnabled
+                    currencyCheckBox.isChecked = state.features.isCurrencyEnabled
+                }
+                is AccountViewModel.State.Error -> {
+                    contentRoot.isInvisible = true
+                    progressBar.isVisible = false
+                    errorView.show(retryAction = { viewModel.loadFeatures() })
+                }
+                is AccountViewModel.State.Loading -> {
+                    contentRoot.isInvisible = true
+                    progressBar.isVisible = true
+                    errorView.hide()
+                }
+            }
+        }
+    }
 
     companion object {
         fun newInstance() = AccountFragment()
