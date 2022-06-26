@@ -20,8 +20,6 @@ android {
         }
     }
 
-    def props = new Properties()
-    props.load(new FileInputStream(rootProject.file("./local.properties")))
     signingConfigs {
         debug {
             storeFile file("DebugKeystore.keystore")
@@ -30,10 +28,23 @@ android {
             keyPassword "debugkey"
         }
         release {
+            def props = new Properties()
+            props.load(new FileInputStream(rootProject.file("./local.properties")))
+
+            def envAlias = System.getenv("APP_SIGN_ALIAS")
+            def envPass = System.getenv("APP_SIGN_PASSWORD")
+
+            if (envAlias == null) {
+                envAlias = props['signing.alias']
+            }
+            if (envPass == null) {
+                envPass = props['signing.pas']
+            }
+
             storeFile file("SmartMirrorKey.keystore")
-            storePassword props['signing.pas']
-            keyAlias = props['signing.alias']
-            keyPassword props['signing.pas']
+            storePassword envPass
+            keyAlias envAlias
+            keyPassword envPass
         }
     }
 
