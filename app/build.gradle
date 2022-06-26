@@ -31,9 +31,9 @@ android {
         }
         release {
             storeFile file("SmartMirrorKey.keystore")
-            storePassword props['signing.password']
+            storePassword props['signing.pas']
             keyAlias props['signing.alias']
-            keyPassword props['signing.password']
+            keyPassword props['signing.pas']
         }
     }
 
