@@ -25,3 +25,5 @@ jobs:
         run: touch ./local.properties
       - name: Build with Gradle
         run: ./gradlew assembleDebug
+      - name: Unit tests
+        run: ./gradlew testDebugUnitTest
