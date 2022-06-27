@@ -2,6 +2,7 @@ package com.iartr.smartmirror.data.currency
 
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
+import com.iartr.smartmirror.data.core.okHttpClient
 import io.reactivex.rxjava3.core.Single
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
@@ -11,10 +12,11 @@ import retrofit2.http.Query
 
 private val retrofit = Retrofit.Builder()
     .baseUrl("https://api.coinbase.com/v2/")
+    .client(okHttpClient)
     .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
     .addConverterFactory(GsonConverterFactory.create())
     .build()
-val currencyApi = retrofit.create(CurrencyApi::class.java)
+val currencyApi: CurrencyApi = retrofit.create(CurrencyApi::class.java)
 
 @Keep
 data class CurrencyResponse(

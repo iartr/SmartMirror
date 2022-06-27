@@ -1,5 +1,6 @@
 package com.iartr.smartmirror.data.coord
 
+import com.iartr.smartmirror.data.core.okHttpClient
 import io.reactivex.rxjava3.core.Single
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
@@ -8,6 +9,7 @@ import retrofit2.http.GET
 
 private val retrofit = Retrofit.Builder()
     .baseUrl("http://ip-api.com/")
+    .client(okHttpClient)
     .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
     .addConverterFactory(GsonConverterFactory.create())
     .build()

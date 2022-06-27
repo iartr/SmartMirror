@@ -133,6 +133,8 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         articlesList.adapter = articlesAdapter
 
         cameraView = view.findViewById(R.id.main_camera_view)
+        displayManager = cameraView.context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+        displayManager.registerDisplayListener(displayListener, null)
         cameraView.post {
             displayId = cameraView.display.displayId
             setupCamera()
