@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="common_network_error">Ошибка загрузки. Проверьте подключение к сети и повторите попытку.</string>
+    <string name="loading">Загрузка...</string>
+    <string name="retry">Повторить</string>
+</resources>

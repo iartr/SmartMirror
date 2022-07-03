@@ -1,4 +1,4 @@
-package com.iartr.smartmirror.utils
+package com.iartr.smartmirror.core.utils
 
 import android.os.Looper
 import android.widget.Toast
@@ -7,7 +7,8 @@ import androidx.annotation.UiThread
 object ToastUtils {
     @JvmStatic
     @JvmOverloads
-    fun showToast(resId: Int, isLongDuration: Boolean = false) = showToast(AppContextHolder.context.resources.getString(resId), isLongDuration)
+    fun showToast(resId: Int, isLongDuration: Boolean = false) =
+       showToast(AppContextHolder.context.resources.getString(resId), isLongDuration)
 
     @JvmStatic
     @JvmOverloads

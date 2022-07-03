@@ -1,4 +1,4 @@
-package com.iartr.smartmirror.utils
+package com.iartr.smartmirror.design
 
 import android.content.Context
 import android.util.AttributeSet
@@ -8,7 +8,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
-import com.iartr.smartmirror.R
+import com.iartr.smartmirror.design.R
 
 class RetryingErrorView(context: Context, attrs: AttributeSet) : LinearLayout(context, attrs) {
 

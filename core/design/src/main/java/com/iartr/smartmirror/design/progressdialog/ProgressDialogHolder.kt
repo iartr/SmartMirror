@@ -1,4 +1,4 @@
-package com.iartr.smartmirror.utils.progressdialog
+package com.iartr.smartmirror.design.progressdialog
 
 import android.app.Activity
 

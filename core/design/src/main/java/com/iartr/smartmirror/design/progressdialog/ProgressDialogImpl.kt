@@ -1,11 +1,10 @@
-package com.iartr.smartmirror.utils.progressdialog
+package com.iartr.smartmirror.design.progressdialog
 
 import android.app.Activity
 import android.app.ProgressDialog
 import android.os.Handler
 import android.os.Looper
-import com.iartr.smartmirror.R
-import com.iartr.smartmirror.utils.safeRun
+import com.iartr.smartmirror.design.R
 
 class ProgressDialogImpl(
     activity: Activity
@@ -23,15 +22,15 @@ class ProgressDialogImpl(
         }
     }
 
-    fun show(delay: Long = 0L) = safeRun {
+    fun show(delay: Long = 0L) = try {
         if (delay > 0) {
             uiHandler.postDelayed({ show() }, delay)
         } else {
             uiHandler.post { show() }
         }
-    }
+    } catch (th: Throwable) { android.util.Log.e("ProgressDialogImpl", "An error occurred", th) }
 
-    fun dismiss() = safeRun {
+    fun dismiss() = try {
         uiHandler.removeCallbacksAndMessages(null)
         uiHandler.post {
             try {
@@ -40,11 +39,11 @@ class ProgressDialogImpl(
             }
             progressDialog = null
         }
-    }
+    } catch (th: Throwable) { android.util.Log.e("ProgressDialogImpl", "An error occurred", th) }
 
     private fun show() {
         if (progressDialog == null) return
-        val context = progressDialog?.context?.toActivitySafe()
+        val context = (progressDialog?.context as? Activity)
         if (context != null && !context.isFinishing && !context.isDestroyed) {
             progressDialog?.show()
         }

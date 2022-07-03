@@ -6,8 +6,8 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
-import com.iartr.smartmirror.utils.ActivityHelper
-import com.iartr.smartmirror.utils.AppContextHolder
+import com.iartr.smartmirror.core.utils.ActivityHelper
+import com.iartr.smartmirror.core.utils.AppContextHolder
 
 class SmartMirrorApplication : Application() {
 

@@ -3,10 +3,7 @@
     <!-- From Firebase generated: 666377868857-6b3mldm7i4d3ppvv5u865aufhc90suu2.apps.googleusercontent.com-->
     <string name="app_name">Умное зеркало</string>
 
-    <string name="loading">Загрузка...</string>
-    <string name="retry">Повторить</string>
     <string name="you_was_sign_out">Вы были разлогинены</string>
-    <string name="common_network_error">Ошибка загрузки. Проверьте подключение к сети и повторите попытку.</string>
 
     <string name="main_accessibility_account_button">Открыть аккаунт</string>
 
@@ -34,7 +31,4 @@
     <string name="account_artices_enabled">Статьи включены?</string>
     <string name="account_currencies_enabled">Валюта включена?</string>
     <string name="account_weather_enabled">Погода включена?</string>
-    <string name="currency">Валюта</string>
-    <string name="history">История</string>
-    <string name="current">Текущие</string>
 </resources>

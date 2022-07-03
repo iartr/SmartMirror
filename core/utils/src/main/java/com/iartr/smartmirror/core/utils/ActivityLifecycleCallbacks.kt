@@ -1,4 +1,4 @@
-package com.iartr.smartmirror.utils
+package com.iartr.smartmirror.core.utils
 
 import android.app.Activity
 import android.app.Application

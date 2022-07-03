@@ -11,7 +11,7 @@ import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfig
-import com.iartr.smartmirror.utils.AppContextHolder
+import com.iartr.smartmirror.core.utils.AppContextHolder
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 
@@ -21,7 +21,8 @@ class FeaturesRepository {
     private val fbRemoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
     private val fbUserDatabase: DatabaseReference
         get() = Firebase.database.reference.child("${Firebase.auth.uid}")
-    private val preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(AppContextHolder.context)
+    private val preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(
+        AppContextHolder.context)
 
     fun isEnabled(feature: FeatureSet): Single<Boolean> {
         return Single.create<Boolean> { emitter ->

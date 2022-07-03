@@ -19,7 +19,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.color.MaterialColors
 import com.iartr.smartmirror.R
 import com.iartr.smartmirror.ui.base.BaseFragment
-import com.iartr.smartmirror.utils.RetryingErrorView
+import com.iartr.smartmirror.design.RetryingErrorView
 
 class AccountFragment : BaseFragment(R.layout.fragment_account) {
 

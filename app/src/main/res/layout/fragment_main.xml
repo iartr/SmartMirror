@@ -50,7 +50,7 @@
             android:layout_gravity="center"
             android:visibility="gone" />
 
-        <com.iartr.smartmirror.utils.RetryingErrorView
+        <com.iartr.smartmirror.design.RetryingErrorView
             android:id="@+id/main_weather_container_error"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -99,7 +99,7 @@
             android:layout_gravity="center"
             android:visibility="gone" />
 
-        <com.iartr.smartmirror.utils.RetryingErrorView
+        <com.iartr.smartmirror.design.RetryingErrorView
             android:id="@+id/main_currency_container_error"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -133,7 +133,7 @@
             android:layout_gravity="center"
             android:visibility="gone" />
 
-        <com.iartr.smartmirror.utils.RetryingErrorView
+        <com.iartr.smartmirror.design.RetryingErrorView
             android:id="@+id/main_articles_container_error"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

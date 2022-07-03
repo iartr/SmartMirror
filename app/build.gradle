@@ -1,23 +1,20 @@
 plugins {
     id 'com.android.application'
-    id 'com.google.gms.google-services'
     id 'kotlin-android'
+    id 'com.google.gms.google-services'
 }
 
 android {
-    compileSdk 32
+    compileSdk DefaultConfig.compileSdk
 
     defaultConfig {
-        applicationId "com.iartr.smartmirror"
-        minSdk 23
-        targetSdk 32
-        versionCode 1
-        versionName "1.0"
+        applicationId DefaultConfig.appId
+        minSdk DefaultConfig.minSdk
+        targetSdk DefaultConfig.targetSdk
+        versionCode Releases.versionCode
+        versionName Releases.versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary true
-        }
     }
 
     signingConfigs {
@@ -62,15 +59,15 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility CompilerOptions.javaVersion
+        targetCompatibility CompilerOptions.javaVersion
         coreLibraryDesugaringEnabled true
     }
     
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
-        useIR = true
+        jvmTarget = CompilerOptions.javaVersion.toString()
     }
+
     packagingOptions {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
@@ -80,89 +77,57 @@ android {
 
 dependencies {
 
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+    coreLibraryDesugaring Libs.desugar
 
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'com.google.android.material:material:1.4.0'
+    implementation Libs.androidKtx
+    implementation Libs.androidAppCompat
+    implementation Libs.androidActivity
+    implementation Libs.androidFragment
+    implementation Libs.androidPreference
+    implementation Libs.androidLegacySupport
+    implementation Libs.androidMaterial
 
-    // https://developer.android.com/jetpack/androidx/releases/activity
-    implementation("androidx.activity:activity-ktx:1.4.0")
-    // https://developer.android.com/jetpack/androidx/releases/fragment
-    implementation("androidx.fragment:fragment-ktx:1.4.1")
-    // https://developer.android.com/jetpack/androidx/releases/preference
-    implementation("androidx.preference:preference-ktx:1.2.0")
-    implementation 'androidx.preference:preference:1.1.1'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation platform(Libs.firebase)
+    implementation Libs.firebaseAnalytics
+    implementation Libs.firebaseDatabase
+    implementation Libs.firebaseAuth
+    implementation Libs.firebaseConfig
 
-    // Navigation component
+    implementation Libs.lifecycleRuntime
+    implementation Libs.lifecycleViewModel
+    implementation Libs.lifecycleViewModelSaveState
+    implementation Libs.lifecycleLiveData
+    implementation Libs.lifecycleRx
 
-    // VM: https://developer.android.com/jetpack/androidx/releases/lifecycle
-    def lifecycle_version = "2.4.1"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version")
-    implementation("androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycle_version")
+    implementation Libs.playServices
+    implementation Libs.googleAds
 
-    // Google ADs
-    implementation 'com.google.android.gms:play-services-ads:20.5.0'
-    // Firebase
-    implementation platform('com.google.firebase:firebase-bom:29.1.0')
-    implementation 'com.google.firebase:firebase-analytics-ktx'
-    implementation 'com.google.firebase:firebase-database-ktx'
-    implementation 'com.google.firebase:firebase-auth-ktx'
-    implementation 'com.google.firebase:firebase-config-ktx'
-    implementation 'com.google.android.gms:play-services-auth:20.1.0'
+    implementation Libs.rxJava
+    implementation Libs.rxKotlin
+    implementation Libs.rxAndroid
 
-    /**
-     * RxJava:
-     * RxKotlin:
-     * RxAndroid:
-    */
-    implementation "io.reactivex.rxjava3:rxjava:3.1.3"
-    implementation("io.reactivex.rxjava3:rxkotlin:3.0.1")
-    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    implementation platform(Libs.okHttp)
+    implementation Libs.okHttpLogger
+    implementation Libs.okHttpMockWebServer
+    implementation Libs.retrofit
+    implementation Libs.retrofitRxSupport
+    implementation Libs.retrofitJsonReader
+    implementation Libs.retrofitScalars
+    implementation Libs.gson
 
-    /**
-     * OkHttp:
-     * Retrofit:
-     */
-    implementation("com.squareup.okhttp3:okhttp:4.9.2")
-    testImplementation("com.squareup.okhttp3:mockwebserver:4.9.1")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'com.google.code.gson:gson:2.8.9'
-    implementation 'com.squareup.retrofit2:converter-scalars:2.1.0'
+    implementation Libs.glide
+    annotationProcessor Libs.glideCompiler
 
-    // https://github.com/bumptech/glide
-    implementation 'com.github.bumptech.glide:glide:4.13.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.13.0'
+    implementation Libs.camera2
+    implementation Libs.cameraXLifecycle
+    implementation Libs.cameraXView
+    implementation Libs.googleMlFaceDetection
 
-    // DI
+    implementation project(":core:utils")
+    implementation project(":core:design")
 
-    /*// compose
-    implementation "androidx.compose.ui:ui:1.0.2"
-    implementation "androidx.compose.material:material:1.0.2"
-    implementation "androidx.compose.ui:ui-tooling-preview:1.0.2"
-    implementation 'androidx.activity:activity-compose:1.3.1'
-    //    debugImplementation "androidx.compose.ui:ui-tooling:1.0.2"
-    */
-
-    // CameraX
-    // CameraX core library using camera2 implementation
-    implementation "androidx.camera:camera-camera2:1.0.2"
-    // CameraX Lifecycle Library
-    implementation "androidx.camera:camera-lifecycle:1.0.2"
-    // CameraX View class
-    implementation "androidx.camera:camera-view:1.0.0-alpha32"
-    implementation 'com.google.mlkit:face-detection:16.1.5'
-
-    // Test
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.0.5"
+    testImplementation LibsTest.junit4
+    testImplementation LibsTest.okhttpMockWebServer
+    androidTestImplementation LibsTest.androidJunit
+    androidTestImplementation LibsTest.androidEspressoCore
 }

@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.annotation.CallSuper
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
-import com.iartr.smartmirror.utils.ActivityHelper
+import com.iartr.smartmirror.core.utils.ActivityHelper
 
 open class BaseActivity(@LayoutRes layout: Int) : AppCompatActivity(layout) {
     override fun onCreate(savedInstanceState: Bundle?) {

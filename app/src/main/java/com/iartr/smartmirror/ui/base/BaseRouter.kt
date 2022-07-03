@@ -6,8 +6,8 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.iartr.smartmirror.R
-import com.iartr.smartmirror.utils.ActivityHelper
-import com.iartr.smartmirror.utils.ToastUtils
+import com.iartr.smartmirror.core.utils.ActivityHelper
+import com.iartr.smartmirror.core.utils.ToastUtils
 
 open class BaseRouter {
     private val currentActivity: AppCompatActivity?

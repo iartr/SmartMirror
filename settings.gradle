@@ -3,8 +3,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        jcenter() // Warning: this repository is going to shut down soon
     }
 }
 rootProject.name = "Smart Mirror"
 include ':app'
+
+include ':core'
+include ':core:utils'
+include ':core:design'

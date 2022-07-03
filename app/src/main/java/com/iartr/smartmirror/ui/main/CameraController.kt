@@ -1,9 +1,7 @@
 package com.iartr.smartmirror.ui.main
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Rect
-import android.hardware.display.DisplayManager
 import android.util.DisplayMetrics
 import android.view.Display
 import androidx.camera.core.AspectRatio
@@ -14,7 +12,6 @@ import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
-import androidx.core.content.getSystemService
 import androidx.lifecycle.LifecycleOwner
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -24,8 +21,7 @@ import com.google.mlkit.vision.face.FaceContour
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.iartr.smartmirror.deviceid.DeviceIdProvider
-import com.iartr.smartmirror.utils.AppContextHolder
-import java.util.concurrent.Executor
+import com.iartr.smartmirror.core.utils.AppContextHolder
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.math.abs

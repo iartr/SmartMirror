@@ -116,7 +116,7 @@
 
         </LinearLayout>
 
-        <com.iartr.smartmirror.utils.RetryingErrorView
+        <com.iartr.smartmirror.design.RetryingErrorView
             android:id="@+id/account_content_retrying_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
