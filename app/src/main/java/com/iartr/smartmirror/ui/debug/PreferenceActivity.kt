@@ -4,11 +4,10 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.os.Process
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import com.iartr.smartmirror.R
-import com.iartr.smartmirror.ui.base.BaseActivity
+import com.iartr.smartmirror.mvvm.BaseActivity
 import kotlin.system.exitProcess
 
 class PreferenceActivity : BaseActivity(R.layout.activity_preferences) {

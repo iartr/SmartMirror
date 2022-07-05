@@ -123,8 +123,14 @@ dependencies {
     implementation Libs.cameraXView
     implementation Libs.googleMlFaceDetection
 
+    implementation project(":features:settings")
+
     implementation project(":core:utils")
+    implementation project(":core:ext")
     implementation project(":core:design")
+    implementation project(":core:toggles-api")
+    implementation project(":core:account-api")
+    implementation project(":core:mvvm")
 
     testImplementation LibsTest.junit4
     testImplementation LibsTest.okhttpMockWebServer

@@ -20,9 +20,9 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.iartr.smartmirror.R
-import com.iartr.smartmirror.ui.base.BaseFragment
 import com.iartr.smartmirror.ui.main.articles.ArticlesAdapter
 import com.iartr.smartmirror.design.RetryingErrorView
+import com.iartr.smartmirror.mvvm.BaseFragment
 
 class MainFragment : BaseFragment(R.layout.fragment_main) {
 

@@ -3,8 +3,6 @@
     <!-- From Firebase generated: 666377868857-6b3mldm7i4d3ppvv5u865aufhc90suu2.apps.googleusercontent.com-->
     <string name="app_name">Умное зеркало</string>
 
-    <string name="you_was_sign_out">Вы были разлогинены</string>
-
     <string name="main_accessibility_account_button">Открыть аккаунт</string>
 
     <string name="main_currency_usd">1 USD = %.2f руб.</string>
@@ -13,22 +11,4 @@
 
     <string name="preference_header">Дебаг-настройки</string>
     <string name="preference_camera">Камера включена?</string>
-
-    <string name="account_title">Ваш аккаунт</string>
-    <string name="account_sign_out">Выйти из аккаунта</string>
-    <string name="account_photo_content_description">Аватар</string>
-    <string name="account_uid">UID: %s</string>
-    <string name="account_display_name">Display name: %s</string>
-    <string name="account_email">Email: %s</string>
-    <string name="account_email_is_verified">Email is verified: %s</string>
-    <string name="account_metadata">Metadata: %s</string>
-    <string name="account_multifactor">Multifactor: %s</string>
-    <string name="account_phone">Phone: %s</string>
-    <string name="account_provider_id">Provider id: %s</string>
-    <string name="account_tenat_id">Tenat id: %s</string>
-    <string name="account_camera_enabled">Камера включена?</string>
-    <string name="account_ads_enabled">Реклама включена?</string>
-    <string name="account_artices_enabled">Статьи включены?</string>
-    <string name="account_currencies_enabled">Валюта включена?</string>
-    <string name="account_weather_enabled">Погода включена?</string>
 </resources>
