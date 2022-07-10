@@ -19,3 +19,5 @@ include(":core:ext")
 
 include(":features")
 include(":features:settings")
+include(":core:network")
+include(":features:news")

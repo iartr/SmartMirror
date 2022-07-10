@@ -109,6 +109,7 @@
 
     </FrameLayout>
 
+    <!-- Все в фиче модуль? Или только вьюху, репозиторий, адаптер как сейчас -->
     <FrameLayout
         android:id="@+id/main_articles_container"
         android:layout_width="0dp"

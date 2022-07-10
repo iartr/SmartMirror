@@ -21,7 +21,13 @@ jobs:
         env:
           APP_SIGN_ALIAS: ${{ secrets.APP_SIGN_ALIAS }}
           APP_SIGN_PASSWORD: ${{ secrets.APP_SIGN_PASSWORD }}
-        run: touch ./local.properties
+          APIKEY_NEWS: ${{ secrets.APIKEY_NEWS }}
+        run: |
+          touch ./local.properties
+          echo apikey.news=\"APIKEY_NEWS\" >> ./local.properties \
+          echo signing.alias=\"APP_SIGN_ALIAS\" >> ./local.properties \
+          echo signing.password=\"APP_SIGN_PASSWORD\" >> ./local.properties \
+          cat ./local.properties
       - name: Build with Gradle
         run: ./gradlew assembleDebug
       - name: Unit tests --stacktrace

@@ -1,4 +1,4 @@
-package com.iartr.smartmirror.data.articles
+package com.iartr.smartmirror.news
 
 import io.reactivex.rxjava3.core.Single
 

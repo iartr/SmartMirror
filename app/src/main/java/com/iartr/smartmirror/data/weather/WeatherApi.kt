@@ -1,20 +1,11 @@
 package com.iartr.smartmirror.data.weather
 
-import com.iartr.smartmirror.data.core.okHttpClient
+import com.iartr.smartmirror.network.retrofitApi
 import io.reactivex.rxjava3.core.Single
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-private val retrofit = Retrofit.Builder()
-    .baseUrl("https://api.openweathermap.org/data/2.5/")
-    .client(okHttpClient)
-    .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-    .addConverterFactory(GsonConverterFactory.create())
-    .build()
-val weatherApi: WeatherApi = retrofit.create(WeatherApi::class.java)
+val weatherApi: WeatherApi = retrofitApi("https://api.openweathermap.org/data/2.5/")
 
 interface WeatherApi {
     @GET("weather?appid=$APP_ID&units=metric")

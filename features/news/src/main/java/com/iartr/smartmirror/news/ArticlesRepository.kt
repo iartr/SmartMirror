@@ -1,8 +1,10 @@
-package com.iartr.smartmirror.data.articles
+package com.iartr.smartmirror.news
 
 import io.reactivex.rxjava3.core.Single
 
-class ArticlesRepository(private val api: NewsApi): IArticlesRepository {
+internal class ArticlesRepository(
+    private val api: NewsApi
+): IArticlesRepository {
 
     override fun getLatest(): Single<List<Article>> {
         return api.getEverything(query = "Mobile development")

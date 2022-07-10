@@ -7,10 +7,6 @@ import com.google.android.gms.ads.LoadAdError
 import com.iartr.smartmirror.BuildConfig
 import com.iartr.smartmirror.account.IAccountRepository
 import com.iartr.smartmirror.account.accountRepositoryProvider
-import com.iartr.smartmirror.data.articles.Article
-import com.iartr.smartmirror.data.articles.ArticlesRepository
-import com.iartr.smartmirror.data.articles.IArticlesRepository
-import com.iartr.smartmirror.data.articles.newsApi
 import com.iartr.smartmirror.data.coord.CoordRepository
 import com.iartr.smartmirror.data.coord.coordApi
 import com.iartr.smartmirror.data.currency.CurrencyRepository
@@ -22,6 +18,9 @@ import com.iartr.smartmirror.data.weather.WeatherRepository
 import com.iartr.smartmirror.data.weather.weatherApi
 import com.iartr.smartmirror.ext.subscribeSuccess
 import com.iartr.smartmirror.mvvm.BaseViewModel
+import com.iartr.smartmirror.news.Article
+import com.iartr.smartmirror.news.IArticlesRepository
+import com.iartr.smartmirror.news.api.NewsFeatureApi
 import com.iartr.smartmirror.toggles.ITogglesRepository
 import com.iartr.smartmirror.toggles.TogglesSet
 import com.iartr.smartmirror.toggles.togglesRepositoryProvider
@@ -36,7 +35,7 @@ class MainViewModel : BaseViewModel() {
         coordRepository = CoordRepository(coordApi = coordApi)
     )
     private val currencyRepository: ICurrencyRepository = CurrencyRepository(api = currencyApi)
-    private val articlesRepository: IArticlesRepository = ArticlesRepository(api = newsApi)
+    private val articlesRepository: IArticlesRepository = NewsFeatureApi().repository()
     private val togglesRepository: ITogglesRepository = togglesRepositoryProvider.value
     private val accountRepository: IAccountRepository = accountRepositoryProvider.value
     override val router = MainRouter()

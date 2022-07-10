@@ -1,4 +1,4 @@
-package com.iartr.smartmirror.ui.main.articles
+package com.iartr.smartmirror.news
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,10 +9,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.iartr.smartmirror.R
-import com.iartr.smartmirror.data.articles.Article
 
-class ArticlesAdapter : ListAdapter<Article, ArticlesAdapter.ArticlesViewHolder>(DiffUtilCallback()) {
+internal class ArticlesAdapter : ListAdapter<Article, ArticlesAdapter.ArticlesViewHolder>(DiffUtilCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticlesViewHolder {
         return ArticlesViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.article_item, parent, false))

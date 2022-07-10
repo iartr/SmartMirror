@@ -15,14 +15,16 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.iartr.smartmirror.R
-import com.iartr.smartmirror.ui.main.articles.ArticlesAdapter
 import com.iartr.smartmirror.design.RetryingErrorView
 import com.iartr.smartmirror.mvvm.BaseFragment
+import com.iartr.smartmirror.news.Article
+import com.iartr.smartmirror.news.api.NewsFeatureApi
 
 class MainFragment : BaseFragment(R.layout.fragment_main) {
 
@@ -42,7 +44,10 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
     private lateinit var articlesList: RecyclerView
     private lateinit var articlesLoader: ProgressBar
     private lateinit var articlesError: RetryingErrorView
-    private val articlesAdapter: ArticlesAdapter by lazy { ArticlesAdapter() }
+    private val articlesAdapter: ListAdapter<Article, *> by lazy {
+        // refactor
+        NewsFeatureApi().recyclerAdapter()
+    }
 
     private lateinit var adView: AdView
 
