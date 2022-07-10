@@ -7,12 +7,11 @@ import com.google.android.gms.ads.LoadAdError
 import com.iartr.smartmirror.BuildConfig
 import com.iartr.smartmirror.account.IAccountRepository
 import com.iartr.smartmirror.account.accountRepositoryProvider
+import com.iartr.smartmirror.currency.ICurrencyRepository
+import com.iartr.smartmirror.currency.api.CurrencyFeatureApi
+import com.iartr.smartmirror.currency.dto.ExchangeRates
 import com.iartr.smartmirror.data.coord.CoordRepository
 import com.iartr.smartmirror.data.coord.coordApi
-import com.iartr.smartmirror.data.currency.CurrencyRepository
-import com.iartr.smartmirror.data.currency.ExchangeRates
-import com.iartr.smartmirror.data.currency.ICurrencyRepository
-import com.iartr.smartmirror.data.currency.currencyApi
 import com.iartr.smartmirror.data.weather.IWeatherRepository
 import com.iartr.smartmirror.data.weather.WeatherRepository
 import com.iartr.smartmirror.data.weather.weatherApi
@@ -34,7 +33,7 @@ class MainViewModel : BaseViewModel() {
         api = weatherApi,
         coordRepository = CoordRepository(coordApi = coordApi)
     )
-    private val currencyRepository: ICurrencyRepository = CurrencyRepository(api = currencyApi)
+    private val currencyRepository: ICurrencyRepository = CurrencyFeatureApi().repository()
     private val articlesRepository: IArticlesRepository = NewsFeatureApi().repository()
     private val togglesRepository: ITogglesRepository = togglesRepositoryProvider.value
     private val accountRepository: IAccountRepository = accountRepositoryProvider.value

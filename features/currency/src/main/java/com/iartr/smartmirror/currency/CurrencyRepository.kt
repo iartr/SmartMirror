@@ -1,8 +1,9 @@
-package com.iartr.smartmirror.data.currency
+package com.iartr.smartmirror.currency
 
+import com.iartr.smartmirror.currency.dto.ExchangeRates
 import io.reactivex.rxjava3.core.Single
 
-class CurrencyRepository(
+internal class CurrencyRepository(
     private val api: CurrencyApi
 ) : ICurrencyRepository {
     override fun getCurrencyExchangeRub(): Single<ExchangeRates> {
