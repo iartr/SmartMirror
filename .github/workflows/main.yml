@@ -11,6 +11,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    env:
+      GRADLE_OPTS: -Dorg.gradle.jvmargs=-Xmx1024m
+
     steps:
       - uses: actions/checkout@v3
       - name: set up JDK 11
@@ -22,13 +26,15 @@ jobs:
           APP_SIGN_ALIAS: ${{ secrets.APP_SIGN_ALIAS }}
           APP_SIGN_PASSWORD: ${{ secrets.APP_SIGN_PASSWORD }}
           APIKEY_NEWS: ${{ secrets.APIKEY_NEWS }}
+          APIKEY_WEATHER: ${{ secrets.APIKEY_WEATHER }}
         run: |
           touch ./local.properties \
-          echo apikey.news=\"$APIKEY_NEWS\" >> ./local.properties \
           echo signing.alias=\"$APP_SIGN_ALIAS\" >> ./local.properties \
           echo signing.pas=\"$APP_SIGN_PASSWORD\" >> ./local.properties \
+          echo apikey.news=\"$APIKEY_NEWS\" >> ./local.properties \
+          echo apikey.weather=\"$APIKEY_WEATHER\" >> ./local.properties \
           cat ./local.properties
       - name: Build with Gradle
         run: ./gradlew assembleDebug
-      - name: Unit tests --stacktrace
-        run: ./gradlew testDebugUnitTest
+      - name: Unit tests
+        run: ./gradlew testDebugUnitTest --stacktrace

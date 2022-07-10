@@ -126,6 +126,9 @@ dependencies {
     implementation project(":features:settings")
     implementation project(":features:news")
     implementation project(":features:currency")
+    implementation project(":features:weather")
+    implementation project(":features:coordinates:api")
+    implementation project(":features:coordinates:impl")
 
     implementation project(":core:utils")
     implementation project(":core:ext")

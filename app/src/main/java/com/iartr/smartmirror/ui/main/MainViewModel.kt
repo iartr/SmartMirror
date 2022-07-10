@@ -4,19 +4,15 @@ import android.content.Intent
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
-import com.iartr.smartmirror.BuildConfig
 import com.iartr.smartmirror.account.IAccountRepository
 import com.iartr.smartmirror.account.accountRepositoryProvider
 import com.iartr.smartmirror.currency.ICurrencyRepository
 import com.iartr.smartmirror.currency.api.CurrencyFeatureApi
 import com.iartr.smartmirror.currency.dto.ExchangeRates
-import com.iartr.smartmirror.data.coord.CoordRepository
-import com.iartr.smartmirror.data.coord.coordApi
-import com.iartr.smartmirror.data.weather.IWeatherRepository
-import com.iartr.smartmirror.data.weather.WeatherRepository
-import com.iartr.smartmirror.data.weather.weatherApi
 import com.iartr.smartmirror.ext.subscribeSuccess
+import com.iartr.smartmirror.impl.CoordRepository
 import com.iartr.smartmirror.mvvm.BaseViewModel
+import com.iartr.smartmirror.network.retrofitApi
 import com.iartr.smartmirror.news.Article
 import com.iartr.smartmirror.news.IArticlesRepository
 import com.iartr.smartmirror.news.api.NewsFeatureApi
@@ -24,14 +20,17 @@ import com.iartr.smartmirror.toggles.ITogglesRepository
 import com.iartr.smartmirror.toggles.TogglesSet
 import com.iartr.smartmirror.toggles.togglesRepositoryProvider
 import com.iartr.smartmirror.utils.ConsumableStream
+import com.iartr.smartmirror.weather.IWeatherRepository
+import com.iartr.smartmirror.weather.api.WeatherFeatureApi
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 class MainViewModel : BaseViewModel() {
     // DI
-    private val weatherRepository: IWeatherRepository = WeatherRepository(
-        api = weatherApi,
-        coordRepository = CoordRepository(coordApi = coordApi)
+    private val weatherRepository: IWeatherRepository = WeatherFeatureApi().repository(
+        coordinatesProvider = CoordRepository(
+            coordApi = retrofitApi("http://ip-api.com")
+        )
     )
     private val currencyRepository: ICurrencyRepository = CurrencyFeatureApi().repository()
     private val articlesRepository: IArticlesRepository = NewsFeatureApi().repository()
@@ -155,14 +154,6 @@ class MainViewModel : BaseViewModel() {
 
     fun getAdRequest(): AdRequest {
         return AdRequest.Builder().build()
-    }
-
-    fun getBannerUnitId(): String {
-        return if (BuildConfig.DEBUG) {
-            "ca-app-pub-3940256099942544/6300978111"
-        } else {
-            "ca-app-pub-7136917781275978/7644983313"
-        }
     }
 
     fun onAccountButtonLongClickListener() {
