@@ -1,4 +1,4 @@
-package com.iartr.smartmirror.utils
+package com.iartr.smartmirror.core.utils
 
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
@@ -8,13 +8,14 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
  * - Values caches until someone subscribes to it
  * - Values consumes after someone receive them with subscription (both cached and ongoing)
  */
-class ConsumableStream<T>() {
+class ConsumableStream<T : Any>() {
 
     private val subj = BehaviorSubject.createDefault<List<T>>(listOf())
 
     @Synchronized
     fun push(value: T) {
-        subj.onNext(subj.value + value)
+        val curr = subj.value ?: listOf()
+        subj.onNext(curr + value)
     }
 
     fun observe(): Observable<T> = subj

@@ -1,4 +1,4 @@
-package com.iartr.smartmirror.deviceid
+package com.iartr.smartmirror.core.utils.deviceid
 
 import android.os.Build
 

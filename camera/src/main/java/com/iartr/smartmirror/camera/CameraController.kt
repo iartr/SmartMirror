@@ -1,7 +1,8 @@
-package com.iartr.smartmirror.ui.main
+package com.iartr.smartmirror.camera
 
 import android.annotation.SuppressLint
 import android.graphics.Rect
+import android.hardware.display.DisplayManager
 import android.util.DisplayMetrics
 import android.view.Display
 import androidx.camera.core.AspectRatio
@@ -12,25 +13,30 @@ import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import androidx.lifecycle.LifecycleOwner
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceContour
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
-import com.iartr.smartmirror.deviceid.DeviceIdProvider
 import com.iartr.smartmirror.core.utils.AppContextHolder
+import com.iartr.smartmirror.core.utils.deviceid.DeviceIdProvider
+import com.iartr.smartmirror.ext.subscribeSuccess
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-class CameraController {
+class CameraController(
+    private val facesReceiveTask: FacesReceiveTask
+) {
+    private val disposables = CompositeDisposable()
 
-    private val facesDatabase = Firebase.database.reference.child("faces")
+    private val deviceId: String by lazy { DeviceIdProvider.getDeviceId() }
 
     private var cameraProvider: ProcessCameraProvider? = null
     private var previewUseCase: Preview? = null
@@ -38,6 +44,10 @@ class CameraController {
     private var camera: Camera? = null
     private var executor: ExecutorService = Executors.newSingleThreadExecutor()
 
+    private var displayManager: DisplayManager? = null
+    private var displayListener: DisplayListener? = null
+
+    @SuppressLint("UnsafeOptInUsageError")
     fun onDisplayChanged(display: Display) {
         previewUseCase?.targetRotation = display.rotation
         imageAnalyzer?.targetRotation = display.rotation
@@ -49,6 +59,11 @@ class CameraController {
         lifecycleOwner: LifecycleOwner
     ) {
         executor = Executors.newSingleThreadExecutor()
+
+        displayListener = DisplayListener(display.displayId, { onDisplayChanged(display) })
+        displayManager = AppContextHolder.context.getSystemService()
+        displayManager?.registerDisplayListener(displayListener, null)
+
         val cameraProviderFuture = ProcessCameraProvider.getInstance(AppContextHolder.context)
         cameraProviderFuture.addListener(
             Runnable {
@@ -61,9 +76,11 @@ class CameraController {
 
     fun release() {
         executor.shutdown()
+        disposables.dispose()
+        displayManager?.unregisterDisplayListener(displayListener)
+        displayListener = null
     }
 
-    // cameraView.display, cameraView.surfaceProvider
     private fun bindCameraUseCases(
         display: Display,
         surfaceProvider: Preview.SurfaceProvider,
@@ -89,7 +106,7 @@ class CameraController {
             camera = cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, previewUseCase, imageAnalyzer)
             previewUseCase?.setSurfaceProvider(surfaceProvider)
         } catch (exc: Exception) {
-            android.util.Log.e("MainFragment", "An error occurred on camera configured", exc)
+            android.util.Log.e("CameraController", "An error occurred on camera configured", exc)
         }
     }
 
@@ -99,36 +116,6 @@ class CameraController {
             return AspectRatio.RATIO_4_3
         }
         return AspectRatio.RATIO_16_9
-    }
-
-    private data class FaceData(
-        val trackingId: Int,
-        val deviceId: String,
-        val timestamp: Long,
-
-        val boundLeft: Int,
-        val boundTop: Int,
-        val boundRight: Int,
-        val boundBottom: Int,
-
-        val smilingProbability: Float,
-        val leftEyeOpenProbability: Float,
-        val rightEyeOpenProbability: Float,
-    ) {
-        companion object {
-            val EMPTY = FaceData(
-                trackingId = -1,
-                deviceId = "",
-                timestamp = -1,
-                boundLeft = -1,
-                boundTop = -1,
-                boundRight = -1,
-                boundBottom = -1,
-                smilingProbability = -1f,
-                leftEyeOpenProbability = -1f,
-                rightEyeOpenProbability = -1f,
-            )
-        }
     }
 
     @SuppressLint("UnsafeOptInUsageError")
@@ -168,23 +155,10 @@ class CameraController {
             // If face tracking was enabled:
             val trackingId = face.trackingId
 
-            android.util.Log.d(
-                "FaceAnalyzer", """
-                Face was detected!
-                face ID: $trackingId
-                bounds: $bounds
-                rotx: $rotX, roty: $rotY, rotz: $rotZ
-                landmarks: $landmarks
-                smiling: $smilingProbability
-                leftEye: $leftEyeOpenProbability
-                rightEye: $rightEyeOpenProbability
-            """.trimIndent()
-            )
-
             if (lastFaceData.trackingId != trackingId) {
                 lastFaceData = lastFaceData.copy(
                     trackingId = trackingId!!,
-                    deviceId = DeviceIdProvider.getDeviceId(),
+                    deviceId = deviceId,
                     timestamp = System.currentTimeMillis(),
                     boundLeft = bounds.left,
                     boundTop = bounds.top,
@@ -194,8 +168,10 @@ class CameraController {
                     leftEyeOpenProbability = leftEyeOpenProbability!!,
                     rightEyeOpenProbability = rightEyeOpenProbability!!,
                 )
-                facesDatabase.push().setValue(lastFaceData)
-                android.util.Log.d("FaceAnalyzer", "Value was sent to database $lastFaceData")
+
+                facesReceiveTask.onFaceReceived(lastFaceData)
+                    .subscribeSuccess { android.util.Log.d("CameraController", "face was successfully proceeded") }
+                    .addTo(disposables)
             }
         }
 

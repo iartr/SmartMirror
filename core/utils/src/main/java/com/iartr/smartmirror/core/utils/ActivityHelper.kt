@@ -8,25 +8,25 @@ import java.lang.ref.WeakReference
 
 object ActivityHelper {
 
-    private var resumedActivity: WeakReference<AppCompatActivity?> = WeakReference(null)
+    private var resumedActivity: WeakReference<Activity?> = WeakReference(null)
 
-    private var createdActivity: WeakReference<AppCompatActivity?> = WeakReference(null)
+    private var createdActivity: WeakReference<Activity?> = WeakReference(null)
 
     fun init(application: Application) {
         application.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks() {
 
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-                createdActivity = WeakReference(activity as? AppCompatActivity)
+                createdActivity = WeakReference(activity)
             }
 
             override fun onActivityResumed(activity: Activity) {
-                resumedActivity = WeakReference(activity as? AppCompatActivity)
+                resumedActivity = WeakReference(activity)
                 createdActivity = resumedActivity
             }
         })
     }
 
-    fun onNewIntent(activity: AppCompatActivity) {
+    fun onNewIntent(activity: Activity) {
         createdActivity = WeakReference(activity)
     }
 

@@ -1,9 +1,7 @@
 package com.iartr.smartmirror.ui.main
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
-import android.hardware.display.DisplayManager
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -21,6 +19,8 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.iartr.smartmirror.R
+import com.iartr.smartmirror.camera.CameraController
+import com.iartr.smartmirror.deps.FacesReceiveTaskFb
 import com.iartr.smartmirror.design.RetryingErrorView
 import com.iartr.smartmirror.mvvm.BaseFragment
 import com.iartr.smartmirror.news.Article
@@ -57,29 +57,13 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
     }
 
     private lateinit var cameraView: PreviewView
-    private lateinit var displayManager: DisplayManager
-    private var displayId = -1
-    /**
-     * We need a display listener for orientation changes that do not trigger a configuration
-     * change, for example if we choose to override config change in manifest or for 180-degree
-     * orientation changes.
-     */
-    private val displayListener = object : DisplayManager.DisplayListener {
-        override fun onDisplayAdded(displayId: Int) = Unit
-        override fun onDisplayRemoved(displayId: Int) = Unit
-        override fun onDisplayChanged(displayId: Int) = view?.let { view ->
-            if (displayId == this@MainFragment.displayId) {
-                cameraController.onDisplayChanged(view.display)
-            }
-        } ?: Unit
-    }
 
     private val googleAuthResultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
         { viewModel.onGoogleAuthResult(it.data) }
     )
 
-    private val cameraController: CameraController = CameraController()
+    private val cameraController: CameraController = CameraController(FacesReceiveTaskFb())
     override val viewModel: MainViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -112,10 +96,7 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
         articlesList.adapter = articlesAdapter
 
         cameraView = view.findViewById(R.id.main_camera_view)
-        displayManager = cameraView.context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
-        displayManager.registerDisplayListener(displayListener, null)
         cameraView.post {
-            displayId = cameraView.display.displayId
             setupCamera()
         }
 
@@ -137,7 +118,6 @@ class MainFragment : BaseFragment(R.layout.fragment_main) {
     override fun onDestroyView() {
         super.onDestroyView()
         adView.pause()
-        displayManager.unregisterDisplayListener(displayListener)
         cameraController.release()
     }
 

@@ -9,10 +9,10 @@ import com.iartr.smartmirror.core.utils.ActivityHelper
 import com.iartr.smartmirror.core.utils.ToastUtils
 
 open class BaseRouter {
-    private val currentActivity: AppCompatActivity?
+    private val currentActivity: Activity?
         get() = ActivityHelper.getCurrentCreatedActivity()
 
-    protected fun withActivity(action: (activity: AppCompatActivity) -> Unit): Unit? {
+    protected fun withActivity(action: (activity: Activity) -> Unit): Unit? {
         return currentActivity?.let(action)
     }
 
@@ -24,7 +24,7 @@ open class BaseRouter {
 
     protected fun openFragment(fragment: Fragment) {
         withActivity {
-            val fm = it.supportFragmentManager
+            val fm = (it as? AppCompatActivity)?.supportFragmentManager ?: return@withActivity
             if (fm.isStateSaved) {
                 return@withActivity
             }

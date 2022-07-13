@@ -8,6 +8,5 @@ buildscript {
         classpath(Libs.androidToolsPlugin)
         classpath(Libs.kotlinGradlePlugin)
         classpath(Libs.playServicesPlugin)
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0")
     }
 }

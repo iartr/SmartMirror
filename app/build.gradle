@@ -118,10 +118,8 @@ dependencies {
     implementation Libs.glide
     annotationProcessor Libs.glideCompiler
 
-    implementation Libs.camera2
-    implementation Libs.cameraXLifecycle
     implementation Libs.cameraXView
-    implementation Libs.googleMlFaceDetection
+    implementation project(":camera")
 
     implementation project(":features:settings")
     implementation project(":features:news")

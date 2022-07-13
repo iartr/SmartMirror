@@ -19,7 +19,7 @@ import com.iartr.smartmirror.news.api.NewsFeatureApi
 import com.iartr.smartmirror.toggles.ITogglesRepository
 import com.iartr.smartmirror.toggles.TogglesSet
 import com.iartr.smartmirror.toggles.togglesRepositoryProvider
-import com.iartr.smartmirror.utils.ConsumableStream
+import com.iartr.smartmirror.core.utils.ConsumableStream
 import com.iartr.smartmirror.weather.IWeatherRepository
 import com.iartr.smartmirror.weather.api.WeatherFeatureApi
 import io.reactivex.rxjava3.core.Observable
