@@ -3,7 +3,7 @@ package com.iartr.smartmirror
 import android.os.Bundle
 import androidx.fragment.app.FragmentContainerView
 import com.iartr.smartmirror.mvvm.BaseActivity
-import com.iartr.smartmirror.ui.main.MainFragment
+import com.iartr.smartmirror.mirror.MirrorFragment
 
 class MainActivity : BaseActivity(R.layout.activity_main) {
     private lateinit var fragmentContainer: FragmentContainerView
@@ -16,7 +16,7 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.fragment_container, MainFragment())
+                .replace(R.id.fragment_container, MirrorFragment())
                 .commit()
         }
     }

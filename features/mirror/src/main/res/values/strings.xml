@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="main_accessibility_account_button">Открыть аккаунт</string>
+    <string name="main_currency_usd">1 USD = %.2f руб.</string>
+    <string name="main_currency_eur">1 EUR = %.2f руб.</string>
+</resources>

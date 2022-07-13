@@ -2,13 +2,4 @@
     <!-- From GMS Console: 653881162314-7mfa1tift9iiksl8ob7g1n6o6qj6rllc.apps.googleusercontent.com -->
     <!-- From Firebase generated: 666377868857-6b3mldm7i4d3ppvv5u865aufhc90suu2.apps.googleusercontent.com-->
     <string name="app_name">Умное зеркало</string>
-
-    <string name="main_accessibility_account_button">Открыть аккаунт</string>
-
-    <string name="main_currency_usd">1 USD = %.2f руб.</string>
-    <string name="main_currency_eur">1 EUR = %.2f руб.</string>
-    <string name="title_activity_preference">PreferenceActivity</string>
-
-    <string name="preference_header">Дебаг-настройки</string>
-    <string name="preference_camera">Камера включена?</string>
 </resources>

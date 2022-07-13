@@ -4,21 +4,24 @@ import android.content.Intent
 import io.reactivex.rxjava3.core.Single
 
 lateinit var accountRepositoryProvider: Lazy<IAccountRepository>
-val accountRepository: IAccountRepository
-    get() = accountRepositoryProvider.value
 
 interface IAccountRepository {
     fun addAuthStateListener(listener: AuthStateListener)
 
     fun removeAuthStateListener(listener: AuthStateListener)
 
-    fun authByGoogle(data: Intent?): Single<Boolean>
-
     fun getAccountInfo(): Account?
 
     fun isLoggedIn(): Boolean
 
     fun logout()
+
+    val google: Google
+
+    interface Google {
+        fun getIntentForAuth(): Intent?
+        fun auth(data: Intent?): Single<Boolean>
+    }
 }
 
 fun interface AuthStateListener {
