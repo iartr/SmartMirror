@@ -24,6 +24,7 @@ android {
 dependencies {
     implementation(Libs.androidKtx)
     implementation(Libs.androidAppCompat)
+    implementation(Libs.javaxInject)
     implementation(Libs.rxJava)
     testImplementation(LibsTest.junit4)
 }

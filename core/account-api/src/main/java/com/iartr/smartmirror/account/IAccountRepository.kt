@@ -3,8 +3,6 @@ package com.iartr.smartmirror.account
 import android.content.Intent
 import io.reactivex.rxjava3.core.Single
 
-lateinit var accountRepositoryProvider: Lazy<IAccountRepository>
-
 interface IAccountRepository {
     fun addAuthStateListener(listener: AuthStateListener)
 

@@ -1,10 +1,9 @@
-import java.io.File
-import kotlin.collections.listOf
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
 }
 
 android {
@@ -26,12 +25,22 @@ android {
     kotlinOptions {
         jvmTarget = CompilerOptions.javaVersion.toString()
     }
+
+    kapt {
+        correctErrorTypes = true
+    }
 }
 
 dependencies {
     implementation(Libs.retrofit)
     implementation(Libs.gson)
     implementation(Libs.rxJava)
+
+    // Только для компонента...
+    implementation(Libs.lifecycleViewModel)
+
+    implementation(Libs.dagger2)
+    kapt(Libs.dagger2Compiler)
 
     implementation(project(":features:weather:api"))
     implementation(project(":features:coordinates:api"))

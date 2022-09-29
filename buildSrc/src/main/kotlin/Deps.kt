@@ -38,6 +38,8 @@ object Libs {
     val androidActivity = "androidx.activity:activity-ktx:${Versions.ANDROID_ACTIVITY_VERSION}"
     // https://developer.android.com/jetpack/androidx/releases/fragment
     val androidFragment = "androidx.fragment:fragment-ktx:${Versions.ANDROID_FRAGMENT_VERSION}"
+    // https://developer.android.com/jetpack/androidx/releases/annotation
+    val androidAnnotation = "androidx.annotation:annotation::${Versions.ANDROID_ANNOTATION_VERSION}"
     // // https://developer.android.com/jetpack/androidx/releases/preference
     val androidPreference = "androidx.preference:preference-ktx:${Versions.ANDROID_PREFERENCE_VERSION}"
     val androidLegacySupport = "androidx.legacy:legacy-support-v4:${Versions.ANDROID_LEGACY_SUPPORT_VERSION}"
@@ -106,6 +108,12 @@ object Libs {
     val cameraXView = "androidx.camera:camera-view:${Versions.CAMERAX_VIEW_VERSION}"
     val googleMlFaceDetection = "com.google.mlkit:face-detection:${Versions.GOOGLE_ML_FACE_DETECTION_VERSION}"
     //endregion
+
+    //region Dagger2
+    val dagger2 = "com.google.dagger:dagger:${Versions.DAGGER2_VERSION}"
+    val dagger2Compiler = "com.google.dagger:dagger-compiler:${Versions.DAGGER2_VERSION}"
+    val javaxInject = "javax.inject:javax.inject:1"
+    //endregion
 }
 
 object LibsTest {
@@ -128,6 +136,7 @@ object Versions {
     const val ANDROID_APPCOMPAT_VERSION = "1.4.2"
     const val ANDROID_ACTIVITY_VERSION = "1.4.0"
     const val ANDROID_FRAGMENT_VERSION = "1.4.1"
+    const val ANDROID_ANNOTATION_VERSION = "1.4.0"
     const val ANDROID_PREFERENCE_VERSION = "1.2.0"
     const val ANDROID_LEGACY_SUPPORT_VERSION = "1.0.0"
     const val ANDROID_MATERIAL_VERSION = "1.6.1"
@@ -153,6 +162,8 @@ object Versions {
     const val CAMERAX_LIFECYCLE_VERSION = "1.0.2"
     const val CAMERAX_VIEW_VERSION = "1.0.0-alpha32"
     const val GOOGLE_ML_FACE_DETECTION_VERSION = "16.1.5"
+
+    const val DAGGER2_VERSION = "2.42"
 
     const val JUNIT4_VERSION = "4.13.2"
     const val ANDROID_JUNIT_VERSION = "1.1.3"

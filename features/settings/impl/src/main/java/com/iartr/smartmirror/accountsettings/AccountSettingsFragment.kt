@@ -1,5 +1,6 @@
 package com.iartr.smartmirror.accountsettings
 
+import android.content.Context
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.Drawable
@@ -17,13 +18,14 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.google.android.material.color.MaterialColors
-import com.iartr.smartmirror.account.accountRepositoryProvider
+import com.iartr.smartmirror.accountsettings.di.accountSettingsFeatureComponentProvider
 import com.iartr.smartmirror.design.RetryingErrorView
 import com.iartr.smartmirror.mvvm.BaseFragment
-import com.iartr.smartmirror.toggles.togglesRepositoryProvider
 import com.iartr.smartmirror.accountsettings.impl.R
+import dagger.Lazy
+import javax.inject.Inject
 
-internal class AccountSettingsFragment : BaseFragment(R.layout.fragment_account) {
+class AccountSettingsFragment : BaseFragment(R.layout.fragment_account) {
 
     private lateinit var errorView: RetryingErrorView
     private lateinit var progressBar: ProgressBar
@@ -47,15 +49,17 @@ internal class AccountSettingsFragment : BaseFragment(R.layout.fragment_account)
         }
     }
 
+    @Inject
+    internal lateinit var viewModelFactory: Lazy<AccountSettingsViewModel.Factory>
+
     override val viewModel: AccountSettingsViewModel by viewModels(
-        factoryProducer = {
-            AccountSettingsViewModel.Factory(
-                togglesRepository = togglesRepositoryProvider.value,
-                accountRepository = accountRepositoryProvider.value,
-                router = AccountRouter(),
-            )
-        }
+        factoryProducer = { viewModelFactory.get() }
     )
+
+    override fun onAttach(context: Context) {
+        accountSettingsFeatureComponentProvider.value.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

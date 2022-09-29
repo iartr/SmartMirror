@@ -15,8 +15,9 @@ import com.iartr.smartmirror.toggles.TogglesSet
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import javax.inject.Inject
 
-internal class AccountSettingsViewModel(
+class AccountSettingsViewModel(
     private val togglesRepository: ITogglesRepository,
     private val accountRepository: IAccountRepository,
     override val router: AccountRouter
@@ -158,7 +159,7 @@ internal class AccountSettingsViewModel(
         object Error : State
     }
     
-    class Factory(
+    class Factory @Inject constructor(
         private val togglesRepository: ITogglesRepository,
         private val accountRepository: IAccountRepository,
         private val router: AccountRouter

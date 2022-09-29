@@ -1,8 +1,7 @@
-import org.jetbrains.kotlin.ir.backend.js.compile
-
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
 }
 
 android {
@@ -24,6 +23,10 @@ android {
     kotlinOptions {
         jvmTarget = CompilerOptions.javaVersion.toString()
     }
+
+    kapt {
+        correctErrorTypes = true
+    }
 }
 
 dependencies {
@@ -36,7 +39,10 @@ dependencies {
     implementation(Libs.gson)
     implementation(Libs.rxJava)
     implementation(Libs.glide)
-    annotationProcessor(Libs.glideCompiler)
+    kapt(Libs.glideCompiler)
+
+    implementation(Libs.dagger2)
+    kapt(Libs.dagger2Compiler)
 
     implementation(Libs.cameraXView)
     implementation(project(":camera"))
@@ -47,9 +53,9 @@ dependencies {
     implementation(project(":features:currency:api"))
     implementation(project(":features:weather:api"))
     implementation(project(":features:coordinates:api"))
-
     implementation(project(":core:toggles-api"))
     implementation(project(":core:account-api"))
+
     implementation(project(":core:network"))
     implementation(project(":core:mvvm"))
     implementation(project(":core:ext"))

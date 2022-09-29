@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
 }
 
 android {
@@ -21,6 +22,10 @@ android {
     kotlinOptions {
         jvmTarget = CompilerOptions.javaVersion.toString()
     }
+
+    kapt {
+        correctErrorTypes = true
+    }
 }
 
 dependencies {
@@ -33,7 +38,10 @@ dependencies {
     implementation(Libs.lifecycleViewModel)
     implementation(Libs.rxJava)
     implementation(Libs.glide)
-    annotationProcessor(Libs.glideCompiler)
+    kapt(Libs.glideCompiler)
+
+    implementation(Libs.dagger2)
+    kapt(Libs.dagger2Compiler)
 
     implementation(project(":features:settings:api"))
 

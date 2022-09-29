@@ -1,6 +1,7 @@
 package com.iartr.smartmirror.mirror
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
@@ -13,19 +14,18 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.iartr.smartmirror.account.accountRepositoryProvider
+import com.iartr.smartmirror.account.IAccountRepository
 import com.iartr.smartmirror.camera.CameraController
-import com.iartr.smartmirror.camera.facesReceiveTaskProvider
-import com.iartr.smartmirror.coordinates.api.coordinatesFeatureApiProvider
-import com.iartr.smartmirror.currency.currencyFeatureApiProvider
+import com.iartr.smartmirror.camera.FacesReceiveTask
 import com.iartr.smartmirror.design.RetryingErrorView
+import com.iartr.smartmirror.mirror.di.MirrorFeatureViewModel
 import com.iartr.smartmirror.mvvm.BaseFragment
-import com.iartr.smartmirror.news.Article
-import com.iartr.smartmirror.news.api.newsFeatureApiProvider
-import com.iartr.smartmirror.toggles.togglesRepositoryProvider
-import com.iartr.smartmirror.weather.weatherFeatureApiProvider
+import com.iartr.smartmirror.news.News
+import dagger.Lazy
+import javax.inject.Inject
 
 class MirrorFragment : BaseFragment(R.layout.fragment_mirror) {
 
@@ -45,10 +45,9 @@ class MirrorFragment : BaseFragment(R.layout.fragment_mirror) {
     private lateinit var articlesList: RecyclerView
     private lateinit var articlesLoader: ProgressBar
     private lateinit var articlesError: RetryingErrorView
-    private val articlesAdapter: ListAdapter<Article, *> by lazy {
-        // refactor
-        newsFeatureApiProvider.value.recyclerAdapter()
-    }
+
+    @Inject
+    internal lateinit var articlesAdapter: Lazy<ListAdapter<News, *>>
 
     private val requestCamera = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         cameraView.isVisible = isGranted
@@ -62,22 +61,24 @@ class MirrorFragment : BaseFragment(R.layout.fragment_mirror) {
         { viewModel.onGoogleAuthResult(it.data) }
     )
 
-    private val cameraController: CameraController by lazy { CameraController(facesReceiveTaskProvider.value) }
+    @Inject
+    internal lateinit var accountRepository: Lazy<IAccountRepository>
+    @Inject
+    internal lateinit var facesReceiveTask: Lazy<FacesReceiveTask>
+    @Inject
+    internal lateinit var viewModelFactory: Lazy<MirrorViewModel.Factory>
+
+    private val cameraController: CameraController by lazy { CameraController(facesReceiveTask.get()) }
 
     override val viewModel: MirrorViewModel by viewModels(
-        factoryProducer = {
-            MirrorViewModel.Factory(
-                weatherRepository = weatherFeatureApiProvider.value.repository(
-                    coordinatesProvider = coordinatesFeatureApiProvider.value.repository()
-                ),
-                currencyRepository = currencyFeatureApiProvider.value.repository(),
-                articlesRepository = newsFeatureApiProvider.value.articlesRepository(),
-                togglesRepository = togglesRepositoryProvider.value,
-                accountRepository = accountRepositoryProvider.value,
-                router = MirrorRouter(),
-            )
-        }
+        factoryProducer = { viewModelFactory.get() }
     )
+
+    override fun onAttach(context: Context) {
+        ViewModelProvider(this).get(MirrorFeatureViewModel::class.java)
+            .mirrorComponent.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -102,7 +103,7 @@ class MirrorFragment : BaseFragment(R.layout.fragment_mirror) {
         articlesList = view.findViewById(R.id.main_articles_list)
         articlesLoader = view.findViewById(R.id.main_articles_container_loader)
         articlesError = view.findViewById(R.id.main_articles_container_error)
-        articlesList.adapter = articlesAdapter
+        articlesList.adapter = articlesAdapter.get()
 
         cameraView = view.findViewById(R.id.main_camera_view)
         cameraView.post {
@@ -209,7 +210,7 @@ class MirrorFragment : BaseFragment(R.layout.fragment_mirror) {
                 articlesLoader.isVisible = false
                 articlesError.hide()
 
-                articlesAdapter.submitList(articlesState.articles)
+                articlesAdapter.get().submitList(articlesState.articles)
             }
             MirrorViewModel.ArticlesState.Disabled -> articlesContainer.isVisible = false
         }
@@ -221,7 +222,7 @@ class MirrorFragment : BaseFragment(R.layout.fragment_mirror) {
     }
 
     private fun onGoogleAuthSignalReceive() {
-        val intent = accountRepositoryProvider.value.google.getIntentForAuth()
+        val intent = accountRepository.get().google.getIntentForAuth()
         googleAuthResultLauncher.launch(intent)
     }
 }

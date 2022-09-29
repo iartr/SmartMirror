@@ -7,7 +7,7 @@ import android.hardware.display.DisplayManager
  * change, for example if we choose to override config change in manifest or for 180-degree
  * orientation changes.
  */
-class DisplayListener(
+internal class DisplayListener(
     private val displayId: Int,
     private val onDisplayChanged: () -> Unit
 ) : DisplayManager.DisplayListener {

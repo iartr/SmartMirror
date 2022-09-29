@@ -3,8 +3,9 @@ package com.iartr.smartmirror.weather
 import com.iartr.smartmirror.coordinates.api.ICoordRepository
 import com.iartr.smartmirror.weather.dto.Weather
 import io.reactivex.rxjava3.core.Single
+import javax.inject.Inject
 
-internal class WeatherRepository(
+internal class WeatherRepository @Inject constructor(
     private val networkDataSource: WeatherNetworkDataSource,
     private val coordinatesProvider: ICoordRepository
 ) : IWeatherRepository {

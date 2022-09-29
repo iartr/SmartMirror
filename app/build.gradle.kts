@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("com.google.gms.google-services")
+    id("kotlin-kapt")
 }
 
 android {
@@ -64,6 +65,10 @@ android {
     kotlinOptions {
         jvmTarget = CompilerOptions.javaVersion.toString()
     }
+
+    kapt {
+        correctErrorTypes = true
+    }
 }
 
 dependencies {
@@ -107,7 +112,10 @@ dependencies {
     implementation(Libs.gson)
 
     implementation(Libs.glide)
-    annotationProcessor(Libs.glideCompiler)
+    kapt(Libs.glideCompiler)
+
+    implementation(Libs.dagger2)
+    kapt(Libs.dagger2Compiler)
 
     implementation(Libs.cameraXView)
     implementation(project(":camera"))

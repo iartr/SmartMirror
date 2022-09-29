@@ -1,8 +1,9 @@
 package com.iartr.smartmirror.currency
 
 import io.reactivex.rxjava3.core.Single
+import javax.inject.Inject
 
-internal class CurrencyRepository(
+internal class CurrencyRepository @Inject constructor(
     private val api: CurrencyApi
 ) : ICurrencyRepository {
     override fun getCurrencyExchangeRub(): Single<ExchangeRates> {

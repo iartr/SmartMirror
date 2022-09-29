@@ -7,8 +7,8 @@ import com.iartr.smartmirror.account.IAccountRepository
 import com.iartr.smartmirror.currency.ICurrencyRepository
 import com.iartr.smartmirror.ext.subscribeSuccess
 import com.iartr.smartmirror.mvvm.BaseViewModel
-import com.iartr.smartmirror.news.Article
-import com.iartr.smartmirror.news.IArticlesRepository
+import com.iartr.smartmirror.news.News
+import com.iartr.smartmirror.news.INewsRepository
 import com.iartr.smartmirror.toggles.ITogglesRepository
 import com.iartr.smartmirror.toggles.TogglesSet
 import com.iartr.smartmirror.core.utils.ConsumableStream
@@ -16,11 +16,12 @@ import com.iartr.smartmirror.currency.ExchangeRates
 import com.iartr.smartmirror.weather.IWeatherRepository
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import javax.inject.Inject
 
 class MirrorViewModel(
     private val weatherRepository: IWeatherRepository,
     private val currencyRepository: ICurrencyRepository,
-    private val articlesRepository: IArticlesRepository,
+    private val articlesRepository: INewsRepository,
     private val togglesRepository: ITogglesRepository,
     private val accountRepository: IAccountRepository,
     override val router: MirrorRouter
@@ -146,7 +147,7 @@ class MirrorViewModel(
     }
 
     sealed interface ArticlesState {
-        data class Success(val articles: List<Article>) : ArticlesState
+        data class Success(val articles: List<News>) : ArticlesState
         object Loading : ArticlesState
         object Error : ArticlesState
         object Disabled : ArticlesState
@@ -159,10 +160,10 @@ class MirrorViewModel(
     }
 
     @Suppress("UNCHECKED_CAST")
-    class Factory(
+    class Factory @Inject constructor(
         private val weatherRepository: IWeatherRepository,
         private val currencyRepository: ICurrencyRepository,
-        private val articlesRepository: IArticlesRepository,
+        private val articlesRepository: INewsRepository,
         private val togglesRepository: ITogglesRepository,
         private val accountRepository: IAccountRepository,
         private val router: MirrorRouter

@@ -1,35 +1,57 @@
 package com.iartr.smartmirror
 
 import android.app.Application
-import android.content.Context
+import androidx.recyclerview.widget.ListAdapter
 import com.google.android.gms.ads.MobileAds
 import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
-import com.iartr.smartmirror.account.accountRepositoryProvider
-import com.iartr.smartmirror.accountsettings.accountSettingsApiProvider
-import com.iartr.smartmirror.camera.facesReceiveTaskProvider
-import com.iartr.smartmirror.coordinates.api.coordinatesFeatureApiProvider
+import com.iartr.smartmirror.account.IAccountRepository
+import com.iartr.smartmirror.accountsettings.AccountSettingFeatureApi
+import com.iartr.smartmirror.accountsettings.di.AccountSettingsFeatureComponent
+import com.iartr.smartmirror.accountsettings.di.AccountSettingsFeatureDependenciesStore
+import com.iartr.smartmirror.accountsettings.di.DaggerAccountSettingsFeatureComponent
+import com.iartr.smartmirror.accountsettings.di.accountSettingsFeatureComponentProvider
+import com.iartr.smartmirror.camera.FacesReceiveTask
+import com.iartr.smartmirror.coordinates.api.ICoordRepository
 import com.iartr.smartmirror.core.utils.ActivityHelper
 import com.iartr.smartmirror.core.utils.AppContextHolder
-import com.iartr.smartmirror.currency.CurrencyFeatureImpl
-import com.iartr.smartmirror.currency.currencyFeatureApiProvider
-import com.iartr.smartmirror.deps.AccountRepository
-import com.iartr.smartmirror.accountsettings.AccountSettingsFeatureImpl
-import com.iartr.smartmirror.deps.FacesReceiveTaskFb
-import com.iartr.smartmirror.news.NewsFeatureImpl
-import com.iartr.smartmirror.deps.TogglesRepository
-import com.iartr.smartmirror.impl.CoordinatesFeatureImpl
-import com.iartr.smartmirror.news.api.newsFeatureApiProvider
-import com.iartr.smartmirror.toggles.togglesRepositoryProvider
-import com.iartr.smartmirror.weather.WeatherFeatureImpl
-import com.iartr.smartmirror.weather.weatherFeatureApiProvider
+import com.iartr.smartmirror.currency.CurrencyFeatureDependencies
+import com.iartr.smartmirror.currency.ICurrencyRepository
+import com.iartr.smartmirror.currency.di.CurrencyFeatureComponent
+import com.iartr.smartmirror.currency.di.DaggerCurrencyFeatureComponent
+import com.iartr.smartmirror.di.AppComponent
+import com.iartr.smartmirror.di.DaggerAppComponent
+import com.iartr.smartmirror.impl.CoordFeatureDependencies
+import com.iartr.smartmirror.impl.di.CoordFeatureComponent
+import com.iartr.smartmirror.impl.di.DaggerCoordFeatureComponent
+import com.iartr.smartmirror.mirror.MirrorFeatureDependencies
+import com.iartr.smartmirror.mirror.di.DaggerMirrorFeatureComponent
+import com.iartr.smartmirror.mirror.di.MirrorFeatureComponent
+import com.iartr.smartmirror.mirror.di.MirrorFeatureDependenciesStore
+import com.iartr.smartmirror.news.INewsRepository
+import com.iartr.smartmirror.news.News
+import com.iartr.smartmirror.news.NewsFeatureDependencies
+import com.iartr.smartmirror.news.di.DaggerNewsFeatureComponent
+import com.iartr.smartmirror.news.di.NewsFeatureComponent
+import com.iartr.smartmirror.news.di.NewsFeatureDependenciesProvider
+import com.iartr.smartmirror.toggles.ITogglesRepository
+import com.iartr.smartmirror.weather.IWeatherRepository
+import com.iartr.smartmirror.weather.WeatherFeatureDependencies
+import com.iartr.smartmirror.weather.di.DaggerWeatherFeatureComponent
+import com.iartr.smartmirror.weather.di.WeatherFeatureComponent
+import com.iartr.smartmirror.weather.di.WeatherFeatureDependenciesStore
 
 class SmartMirrorApplication : Application() {
+
+    internal lateinit var appComponent: AppComponent
+    internal lateinit var weatherComponent: WeatherFeatureComponent
+    internal lateinit var newsComponent: NewsFeatureComponent
+    internal lateinit var currencyComponent: CurrencyFeatureComponent
+    internal lateinit var accountFeatureComponent: AccountSettingsFeatureComponent
+    internal lateinit var coordFeatureComponent: CoordFeatureComponent
+    internal lateinit var mirrorFeatureComponent: MirrorFeatureComponent
 
     init {
         AppContextHolder.context = this
@@ -61,20 +83,31 @@ class SmartMirrorApplication : Application() {
     }
 
     private fun initDeps() {
-        togglesRepositoryProvider = lazy {
-            TogglesRepository(
-                fbRemoteConfig = Firebase.remoteConfig,
-                fbUserDatabase = { Firebase.database.reference.child("${Firebase.auth.uid}") },
-                preferences = getSharedPreferences("preference_toggles", Context.MODE_PRIVATE),
-            )
-        }
+        appComponent = DaggerAppComponent.factory().create(appContext = this)
+        AccountSettingsFeatureDependenciesStore.deps = appComponent
 
-        accountRepositoryProvider = lazy { AccountRepository(firebaseAuth = FirebaseAuth.getInstance()) }
-        accountSettingsApiProvider = lazy { AccountSettingsFeatureImpl() }
-        newsFeatureApiProvider = lazy { NewsFeatureImpl() }
-        currencyFeatureApiProvider = lazy { CurrencyFeatureImpl() }
-        coordinatesFeatureApiProvider = lazy { CoordinatesFeatureImpl() }
-        weatherFeatureApiProvider = lazy { WeatherFeatureImpl() }
-        facesReceiveTaskProvider = lazy { FacesReceiveTaskFb() }
+        currencyComponent = DaggerCurrencyFeatureComponent.factory().create(deps = CurrencyFeatureDependencies.EMPTY)
+        coordFeatureComponent = DaggerCoordFeatureComponent.factory().create(deps = CoordFeatureDependencies.EMPTY)
+
+        WeatherFeatureDependenciesStore.deps = object : WeatherFeatureDependencies {
+            override val coordinatesRepository: ICoordRepository = coordFeatureComponent.repository()
+        }
+        weatherComponent = DaggerWeatherFeatureComponent.factory().create(deps = WeatherFeatureDependenciesStore.deps)
+
+        newsComponent = DaggerNewsFeatureComponent.factory().create(deps = NewsFeatureDependencies.EMPTY)
+        accountFeatureComponent = DaggerAccountSettingsFeatureComponent.factory().create(deps = AccountSettingsFeatureDependenciesStore.deps)
+        accountSettingsFeatureComponentProvider = lazy { accountFeatureComponent }
+
+        MirrorFeatureDependenciesStore.deps = object : MirrorFeatureDependencies {
+            override val weatherRepository: IWeatherRepository = weatherComponent.repository()
+            override val newsRepository: INewsRepository = newsComponent.newsRepository()
+            override val newsRecyclerAdapter: ListAdapter<News, *> = newsComponent.recyclerAdapter()
+            override val currencyRepository: ICurrencyRepository = currencyComponent.repository()
+            override val togglesRepository: ITogglesRepository = appComponent.togglesRepository
+            override val accountRepository: IAccountRepository = appComponent.accountRepository
+            override val accountSettingsApi: AccountSettingFeatureApi = accountFeatureComponent
+            override val facesReceiveTask: FacesReceiveTask = appComponent.facesReceiveTask
+        }
+        mirrorFeatureComponent = DaggerMirrorFeatureComponent.factory().create(deps = MirrorFeatureDependenciesStore.deps)
     }
 }

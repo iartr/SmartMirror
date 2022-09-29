@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 
 @Keep
-data class Article(
+data class News(
     @SerializedName("source") val source: Any?,
     @SerializedName("author") val author: String?,
     @SerializedName("title") val title: String,

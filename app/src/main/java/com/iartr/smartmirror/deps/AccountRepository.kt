@@ -14,10 +14,13 @@ import com.iartr.smartmirror.account.AuthStateListener
 import com.iartr.smartmirror.account.IAccountRepository
 import com.iartr.smartmirror.core.utils.AppContextHolder
 import com.iartr.smartmirror.R
+import com.iartr.smartmirror.core.utils.dagger.AppScope
 import io.reactivex.rxjava3.core.Single
 import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
 
-class AccountRepository(
+@AppScope
+class AccountRepository @Inject constructor(
     private val firebaseAuth: FirebaseAuth
 ): IAccountRepository {
     private val listeners: MutableMap<AuthStateListener, FirebaseAuth.AuthStateListener> = ConcurrentHashMap()

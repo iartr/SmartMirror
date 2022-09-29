@@ -5,15 +5,20 @@ import androidx.core.content.edit
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.iartr.smartmirror.core.utils.dagger.AppScope
+import com.iartr.smartmirror.di.PrefsToggles
 import com.iartr.smartmirror.toggles.ITogglesRepository
 import com.iartr.smartmirror.toggles.TogglesSet
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.functions.Function4
+import javax.inject.Inject
 
-class TogglesRepository(
+@AppScope
+class FirebaseBasedTogglesRepository @Inject constructor(
     private val fbRemoteConfig: FirebaseRemoteConfig,
-    private val fbUserDatabase: () -> DatabaseReference,
-    private val preferences: SharedPreferences
+    private val fbUserDatabase: Function0<@JvmSuppressWildcards DatabaseReference>,
+    @PrefsToggles private val preferences: SharedPreferences,
 ) : ITogglesRepository {
     override fun isEnabled(toggle: TogglesSet): Single<Boolean> {
         return Single.create<Boolean> { emitter ->

@@ -6,5 +6,5 @@ import androidx.annotation.Keep
 internal data class GetEverythingResponse(
     val status: String,
     val totalResults: Int,
-    val articles: List<Article>
+    val articles: List<News>
 )

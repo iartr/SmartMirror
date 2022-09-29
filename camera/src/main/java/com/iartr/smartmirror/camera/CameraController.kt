@@ -27,11 +27,12 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-class CameraController(
+class CameraController @Inject constructor(
     private val facesReceiveTask: FacesReceiveTask
 ) {
     private val disposables = CompositeDisposable()
