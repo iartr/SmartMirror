@@ -1,7 +1,7 @@
 package com.iartr.smartmirror.camera
 
-import io.reactivex.rxjava3.core.Completable
+import kotlinx.coroutines.flow.Flow
 
 fun interface FacesReceiveTask {
-    fun onFaceReceived(faceData: FaceData): Completable
+    fun onFaceReceived(faceData: FaceData): Flow<Unit>
 }

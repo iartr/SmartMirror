@@ -28,8 +28,6 @@ android {
 dependencies {
     implementation(Libs.androidKtx)
     implementation(Libs.androidAppCompat)
-    implementation(Libs.rxJava)
-    implementation(Libs.rxKotlin)
 
     implementation(Libs.coroutinesCore)
     implementation(Libs.coroutinesAndroid)

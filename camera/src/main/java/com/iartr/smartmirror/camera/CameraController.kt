@@ -22,9 +22,14 @@ import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.iartr.smartmirror.core.utils.AppContextHolder
 import com.iartr.smartmirror.core.utils.deviceid.DeviceIdProvider
-import com.iartr.smartmirror.ext.subscribeSuccess
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -35,7 +40,10 @@ import kotlin.math.min
 class CameraController @Inject constructor(
     private val facesReceiveTask: FacesReceiveTask
 ) {
-    private val disposables = CompositeDisposable()
+    private val coroutineExceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+        android.util.Log.e("CameraController", "An error occured in coroutine", throwable)
+    }
+    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + coroutineExceptionHandler + CoroutineName("camera-controller-coroutine-scope"))
 
     private val deviceId: String by lazy { DeviceIdProvider.getDeviceId() }
 
@@ -77,7 +85,7 @@ class CameraController @Inject constructor(
 
     fun release() {
         executor.shutdown()
-        disposables.dispose()
+        coroutineScope.cancel()
         displayManager?.unregisterDisplayListener(displayListener)
         displayListener = null
     }
@@ -171,8 +179,8 @@ class CameraController @Inject constructor(
                 )
 
                 facesReceiveTask.onFaceReceived(lastFaceData)
-                    .subscribeSuccess { android.util.Log.d("CameraController", "face was successfully proceeded") }
-                    .addTo(disposables)
+                    .onEach { android.util.Log.d("CameraController", "face was successfully proceeded") }
+                    .launchIn(coroutineScope)
             }
         }
 
