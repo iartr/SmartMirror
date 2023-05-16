@@ -6,18 +6,18 @@ object Releases {
 }
 
 object CompilerOptions {
-    val javaVersion = JavaVersion.VERSION_11
+    val javaVersion = JavaVersion.VERSION_17
 }
 
 object DefaultConfig {
-    val buildToolsVersion = "31.0.0"
     val appId = "com.iartr.smartmirror"
-    val minSdk = 23
-    val targetSdk = 32
-    val compileSdk = 32
+    val minSdk = 24
+    val targetSdk = 33
+    val compileSdk = 33
 }
 
 object Libs {
+    // https://developer.android.com/build/releases/gradle-plugin#kts
     val androidToolsPlugin = "com.android.tools.build:gradle:${Versions.ANDROID_GRADLE_PLUGIN_VERSION}"
 
     // D8
@@ -48,6 +48,7 @@ object Libs {
     //endregion
 
     //region Lifecycle
+    // https://developer.android.com/jetpack/androidx/releases/lifecycle
     val lifecycleRuntime = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.LIFECYCLE_VERSION}"
     val lifecycleViewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.LIFECYCLE_VERSION}"
     val lifecycleViewModelSaveState = "androidx.lifecycle:lifecycle-viewmodel-savedstate:${Versions.LIFECYCLE_VERSION}"
@@ -110,9 +111,15 @@ object Libs {
     //endregion
 
     //region Dagger2
+    // https://github.com/google/dagger
     val dagger2 = "com.google.dagger:dagger:${Versions.DAGGER2_VERSION}"
     val dagger2Compiler = "com.google.dagger:dagger-compiler:${Versions.DAGGER2_VERSION}"
     val javaxInject = "javax.inject:javax.inject:1"
+    //endregion
+
+    //region Coroutines
+    val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.COROUTINES_VERSION}"
+    val coroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.COROUTINES_VERSION}"
     //endregion
 }
 
@@ -127,10 +134,10 @@ object LibsTest {
 }
 
 object Versions {
-    const val ANDROID_GRADLE_PLUGIN_VERSION = "7.2.1"
+    const val ANDROID_GRADLE_PLUGIN_VERSION = "8.0.0"
     const val DESUGAR_VERSION = "1.1.5"
 
-    const val KOTLIN_VERSION = "1.7.0"
+    const val KOTLIN_VERSION = "1.8.20"
 
     const val ANDROID_KTX_VERSION = "1.8.0"
     const val ANDROID_APPCOMPAT_VERSION = "1.4.2"
@@ -141,7 +148,7 @@ object Versions {
     const val ANDROID_LEGACY_SUPPORT_VERSION = "1.0.0"
     const val ANDROID_MATERIAL_VERSION = "1.6.1"
 
-    const val LIFECYCLE_VERSION = "2.4.1"
+    const val LIFECYCLE_VERSION = "2.6.1"
 
     const val FIREBASE_VERSION = "29.1.0"
     const val PLAY_SERVICES_PLUGIN_VERSION = "4.3.12"
@@ -163,9 +170,11 @@ object Versions {
     const val CAMERAX_VIEW_VERSION = "1.0.0-alpha32"
     const val GOOGLE_ML_FACE_DETECTION_VERSION = "16.1.5"
 
-    const val DAGGER2_VERSION = "2.42"
+    const val DAGGER2_VERSION = "2.46.1"
 
     const val JUNIT4_VERSION = "4.13.2"
     const val ANDROID_JUNIT_VERSION = "1.1.3"
     const val ESPRESSO_CORE_VERSION = "3.4.0"
+
+    const val COROUTINES_VERSION = "1.7.1"
 }

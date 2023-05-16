@@ -11,13 +11,16 @@ class MainActivity : BaseActivity(R.layout.activity_main) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        fragmentContainer = findViewById(R.id.fragment_container)
+        com.iartr.smartmirror.design.R.id.fragment_container
+        fragmentContainer = findViewById(fragmentContainerId)
 
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.fragment_container, MirrorFragment())
+                .replace(fragmentContainerId, MirrorFragment())
                 .commit()
         }
     }
+
+    private val fragmentContainerId = com.iartr.smartmirror.design.R.id.fragment_container
 }

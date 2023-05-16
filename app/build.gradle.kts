@@ -8,6 +8,8 @@ plugins {
 }
 
 android {
+    namespace = DefaultConfig.appId
+
     compileSdk = DefaultConfig.compileSdk
 
     defaultConfig {
@@ -101,6 +103,9 @@ dependencies {
     implementation(Libs.rxJava)
     implementation(Libs.rxKotlin)
     implementation(Libs.rxAndroid)
+
+    implementation(Libs.coroutinesCore)
+    implementation(Libs.coroutinesAndroid)
 
     implementation(platform(Libs.okHttp))
     implementation(Libs.okHttpLogger)

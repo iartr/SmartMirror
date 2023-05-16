@@ -4,6 +4,8 @@ plugins {
 }
 
 android {
+    namespace = "${DefaultConfig.appId}.accountsettings.api"
+
     compileSdk = DefaultConfig.compileSdk
 
     defaultConfig {

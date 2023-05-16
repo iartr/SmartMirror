@@ -31,7 +31,7 @@ open class BaseRouter {
 
             fm.beginTransaction()
                 .addToBackStack(null)
-                .replace(R.id.fragment_container, fragment)
+                .replace(com.iartr.smartmirror.design.R.id.fragment_container, fragment)
                 .commit()
         }
     }

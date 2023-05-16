@@ -5,8 +5,9 @@ plugins {
 }
 
 android {
-    compileSdk = DefaultConfig.compileSdk
+    namespace = "${DefaultConfig.appId}.mirror"
 
+    compileSdk = DefaultConfig.compileSdk
 
     defaultConfig {
         minSdk = DefaultConfig.minSdk

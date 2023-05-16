@@ -6,6 +6,8 @@ plugins {
 }
 
 android {
+    namespace = "${DefaultConfig.appId}.camera"
+
     compileSdk = DefaultConfig.compileSdk
 
     defaultConfig {
@@ -28,6 +30,9 @@ dependencies {
     implementation(Libs.androidAppCompat)
     implementation(Libs.rxJava)
     implementation(Libs.rxKotlin)
+
+    implementation(Libs.coroutinesCore)
+    implementation(Libs.coroutinesAndroid)
 
     implementation(Libs.camera2)
     implementation(Libs.cameraXView)

@@ -28,7 +28,7 @@ class AccountSettingsViewModel(
             return@AuthStateListener
         }
 
-        router.showToast(R.string.you_was_sign_out)
+        router.showToast(com.iartr.smartmirror.account.R.string.you_was_sign_out)
         router.back()
     }
 

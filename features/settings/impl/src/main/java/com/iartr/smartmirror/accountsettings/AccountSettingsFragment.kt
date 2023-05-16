@@ -44,8 +44,8 @@ class AccountSettingsFragment : BaseFragment(R.layout.fragment_account) {
     private lateinit var weatherCheckBox: CheckBox
     private lateinit var logoutButton: Button
     private val errorAccountDrawable: Drawable? by lazy {
-        ContextCompat.getDrawable(requireContext(), R.drawable.ic_account_circle_outline_24)?.apply {
-            colorFilter = PorterDuffColorFilter(MaterialColors.getColor(requireView(), R.attr.background_highlighted), PorterDuff.Mode.SRC_ATOP)
+        ContextCompat.getDrawable(requireContext(), com.iartr.smartmirror.accountsettings.api.R.drawable.ic_account_circle_outline_24)?.apply {
+            colorFilter = PorterDuffColorFilter(MaterialColors.getColor(requireView(), com.iartr.smartmirror.design.R.attr.background_highlighted), PorterDuff.Mode.SRC_ATOP)
         }
     }
 

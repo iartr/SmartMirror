@@ -5,6 +5,8 @@ plugins {
 }
 
 android {
+    namespace = "${DefaultConfig.appId}.coordinates.impl"
+
     compileSdk = DefaultConfig.compileSdk
 
     defaultConfig {

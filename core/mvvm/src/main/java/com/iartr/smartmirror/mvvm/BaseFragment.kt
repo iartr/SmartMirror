@@ -30,7 +30,7 @@ abstract class BaseFragment(@LayoutRes layoutId: Int) : Fragment(layoutId) {
         fragmentDisposables.clear()
     }
 
-    protected fun <T> Observable<T>.subscribeWithFragment(onNext: (T) -> Unit) {
+    protected fun <T: Any> Observable<T>.subscribeWithFragment(onNext: (T) -> Unit) {
         this
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(onNext, { android.util.Log.e("Observable_onError at ${this.javaClass.simpleName}", "An error occurred", it) }, {  })

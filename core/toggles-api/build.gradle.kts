@@ -4,6 +4,8 @@ plugins {
 }
 
 android {
+    namespace = "${DefaultConfig.appId}.toggles"
+
     compileSdk = DefaultConfig.compileSdk
 
     defaultConfig {

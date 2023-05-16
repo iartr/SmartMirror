@@ -8,6 +8,8 @@ plugins {
 }
 
 android {
+    namespace = "${DefaultConfig.appId}.currency.impl"
+
     compileSdk = DefaultConfig.compileSdk
 
     defaultConfig {

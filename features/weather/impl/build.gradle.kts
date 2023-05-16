@@ -7,6 +7,8 @@ plugins {
 }
 
 android {
+    namespace = "${DefaultConfig.appId}.weather.impl"
+
     compileSdk = DefaultConfig.compileSdk
 
     defaultConfig {

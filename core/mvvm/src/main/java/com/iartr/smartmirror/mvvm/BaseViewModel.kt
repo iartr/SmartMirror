@@ -41,15 +41,15 @@ open class BaseViewModel(
             .doFinally { isProgressDialogVisibleMutable.onNext(false) }
     }
 
-    protected fun <T : Any> Single<T>.withErrorDisplay(@StringRes stringRes: Int = R.string.common_network_error): Single<T> {
+    protected fun <T : Any> Single<T>.withErrorDisplay(@StringRes stringRes: Int = com.iartr.smartmirror.design.R.string.common_network_error): Single<T> {
         return doOnError { router.showToast(stringRes) }
     }
 
-    protected fun <T : Any> Observable<T>.withErrorDisplay(@StringRes stringRes: Int = R.string.common_network_error): Observable<T> {
+    protected fun <T : Any> Observable<T>.withErrorDisplay(@StringRes stringRes: Int = com.iartr.smartmirror.design.R.string.common_network_error): Observable<T> {
         return doOnError { router.showToast(stringRes) }
     }
 
-    protected fun Completable.withErrorDisplay(@StringRes stringRes: Int = R.string.common_network_error): Completable {
+    protected fun Completable.withErrorDisplay(@StringRes stringRes: Int = com.iartr.smartmirror.design.R.string.common_network_error): Completable {
         return doOnError { router.showToast(stringRes) }
     }
 }

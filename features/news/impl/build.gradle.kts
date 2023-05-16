@@ -7,8 +7,9 @@ plugins {
 }
 
 android {
-    compileSdk = DefaultConfig.compileSdk
+    namespace = "${DefaultConfig.appId}.news.impl"
 
+    compileSdk = DefaultConfig.compileSdk
 
     defaultConfig {
         minSdk = DefaultConfig.minSdk
