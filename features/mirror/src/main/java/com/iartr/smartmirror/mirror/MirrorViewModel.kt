@@ -17,12 +17,16 @@ import com.iartr.smartmirror.currency.ExchangeRates
 import com.iartr.smartmirror.weather.IWeatherRepository
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.plus
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.zip
 import javax.inject.Inject
 
 class MirrorViewModel(
@@ -34,8 +38,8 @@ class MirrorViewModel(
     override val router: MirrorRouter
 ) : BaseViewModel(router) {
 
-    private val weatherStateMutable = BehaviorSubject.createDefault<WeatherState>(WeatherState.Loading)
-    val weatherState: Observable<WeatherState> = weatherStateMutable.distinctUntilChanged()
+    private val weatherStateMutable = MutableStateFlow<WeatherState>(WeatherState.Loading)
+    val weatherState: StateFlow<WeatherState> = weatherStateMutable.asStateFlow()
 
     private val currencyStateMutable = BehaviorSubject.createDefault<CurrencyState>(CurrencyState.Loading)
     val currencyState: Observable<CurrencyState> = currencyStateMutable.distinctUntilChanged()
@@ -61,22 +65,23 @@ class MirrorViewModel(
     }
 
     fun loadWeather() {
-        togglesRepository.isEnabled(TogglesSet.WEATHER)
-            .zipWith(weatherRepository.getCurrentWeather(), { t1, t2 -> t1 to t2 })
-            .doOnSubscribe { weatherStateMutable.onNext(WeatherState.Loading) }
-            .doOnError { weatherStateMutable.onNext(WeatherState.Error) }
-            .subscribeSuccess { (isActive, weather) ->
+        togglesRepository.isEnabled2(TogglesSet.WEATHER)
+            .zip(weatherRepository.getCurrentWeather(), { t1, t2 -> t1 to t2 })
+            .catch { weatherStateMutable.emit(WeatherState.Error) }
+            .onStart { weatherStateMutable.emit(WeatherState.Loading) }
+            .onEach { (isActive, weather) ->
                 if (!isActive) {
-                    weatherStateMutable.onNext(WeatherState.Disabled)
-                    return@subscribeSuccess
+                    weatherStateMutable.emit(WeatherState.Disabled)
+                    return@onEach
                 }
 
 //                val icon = it.weatherDescriptions.first().icon.toString()
                 val icon = weather.weatherDescriptions.first().description
                 val temp = weather.temperature.temp.toInt().toString()
-                weatherStateMutable.onNext(WeatherState.Success(temp, icon))
+                weatherStateMutable.emit(WeatherState.Success(temp, icon))
             }
-            .addTo(disposables)
+            .flowOn(Dispatchers.IO)
+            .launchIn(viewModelScope)
     }
 
     fun loadCurrency() {

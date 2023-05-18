@@ -14,7 +14,6 @@ android {
 
     defaultConfig {
         minSdk = DefaultConfig.minSdk
-        targetSdk = DefaultConfig.targetSdk
 
         val apikey = gradleLocalProperties(rootDir).getProperty("apikey.weather")
         buildConfigField(type = "String", name = "API_KEY_WEATHER", value = "\"$apikey\"")
@@ -43,7 +42,6 @@ android {
 
 dependencies {
     implementation(Libs.gson)
-    implementation(Libs.rxJava)
     implementation(Libs.coroutinesCore)
     implementation(Libs.coroutinesAndroid)
 

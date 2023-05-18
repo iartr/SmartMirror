@@ -1,7 +1,7 @@
 package com.iartr.smartmirror.coordinates.api
 
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.Flow
 
 interface ICoordRepository {
-    fun loadCoord(): Single<Coordinates>
+    fun loadCoord(): Flow<Coordinates>
 }

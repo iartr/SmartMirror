@@ -12,6 +12,10 @@ import com.iartr.smartmirror.toggles.TogglesSet
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.functions.Function4
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 
 @AppScope
@@ -41,6 +45,35 @@ class FirebaseBasedTogglesRepository @Inject constructor(
                     emitter.onComplete()
                 }
                 .addOnFailureListener { emitter.tryOnError(it) }
+        }
+    }
+
+    override fun isEnabled2(toggle: TogglesSet): Flow<Boolean> {
+        return callbackFlow {
+            val remoteConfigValue = fbRemoteConfig.getBoolean(toggle.asString)
+            val preferenceValue = preferences.getBoolean(toggle.asString, toggle.defaultEnabled)
+            fbUserDatabase().child(toggle.asString).get()
+                .addOnSuccessListener {
+                    val dbValue = it.getValue<Boolean>() ?: toggle.defaultEnabled
+                    trySendBlocking(remoteConfigValue && preferenceValue && dbValue)
+                }
+                .addOnFailureListener { close(it) }
+
+            awaitClose()
+        }
+    }
+
+    override fun setEnabled2(toggle: TogglesSet, isEnabled: Boolean): Flow<Unit> {
+        return callbackFlow {
+            fbUserDatabase().child(toggle.asString).setValue(isEnabled)
+                .addOnSuccessListener {
+                    preferences.edit { putBoolean(toggle.asString, isEnabled) }
+                    trySendBlocking(Unit)
+                    close()
+                }
+                .addOnFailureListener { close(it) }
+
+            awaitClose()
         }
     }
 }

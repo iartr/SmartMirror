@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.iartr.smartmirror.account.IAccountRepository
@@ -111,11 +112,14 @@ class MirrorFragment : BaseFragment(R.layout.fragment_mirror) {
         }
 
         viewModel.isAccountVisible.subscribeWithFragment { accountButton.isVisible = it }
-        viewModel.weatherState.subscribeWithFragment(::applyWeatherState)
         viewModel.currencyState.subscribeWithFragment(::applyCurrencyState)
         viewModel.articlesState.subscribeWithFragment(::applyArticlesState)
         viewModel.cameraState.subscribeWithFragment(::applyCameraState)
         viewModel.googleAuthSignal.subscribeWithFragment { onGoogleAuthSignalReceive() }
+
+        lifecycleScope.launchWhenResumed {
+            viewModel.weatherState.collect(::applyWeatherState)
+        }
     }
 
     override fun onDestroyView() {
