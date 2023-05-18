@@ -37,6 +37,8 @@ dependencies {
     implementation(Libs.retrofit)
     implementation(Libs.gson)
     implementation(Libs.rxJava)
+    implementation(Libs.coroutinesCore)
+    implementation(Libs.coroutinesAndroid)
 
     // Только для компонента...
     implementation(Libs.lifecycleViewModel)

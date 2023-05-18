@@ -31,6 +31,8 @@ dependencies {
     implementation(Libs.rxJava)
     implementation(Libs.rxAndroid)
     implementation(Libs.rxKotlin)
+    implementation(Libs.coroutinesCore)
+    implementation(Libs.coroutinesAndroid)
 
     implementation(project(":core:utils"))
     implementation(project(":core:design"))

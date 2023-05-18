@@ -3,6 +3,7 @@ package com.iartr.smartmirror.mirror
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.iartr.smartmirror.account.IAccountRepository
 import com.iartr.smartmirror.currency.ICurrencyRepository
 import com.iartr.smartmirror.ext.subscribeSuccess
@@ -16,6 +17,12 @@ import com.iartr.smartmirror.currency.ExchangeRates
 import com.iartr.smartmirror.weather.IWeatherRepository
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.plus
 import javax.inject.Inject
 
 class MirrorViewModel(
@@ -128,8 +135,9 @@ class MirrorViewModel(
 
     fun onGoogleAuthResult(data: Intent?) {
         accountRepository.google.auth(data)
-            .subscribeSuccess { router.openAccount() }
-            .addTo(disposables)
+            .flowOn(Dispatchers.IO)
+            .onEach { router.openAccount() }
+            .launchIn(viewModelScope)
     }
 
     sealed interface WeatherState {

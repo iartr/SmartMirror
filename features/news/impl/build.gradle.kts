@@ -48,6 +48,9 @@ dependencies {
     implementation(Libs.dagger2)
     kapt(Libs.dagger2Compiler)
 
+    implementation(Libs.coroutinesCore)
+    implementation(Libs.coroutinesAndroid)
+
     implementation(project(":features:news:api"))
 
     implementation(project(":core:network"))

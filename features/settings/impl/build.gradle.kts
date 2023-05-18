@@ -39,6 +39,8 @@ dependencies {
     implementation(Libs.lifecycleRuntime)
     implementation(Libs.lifecycleViewModel)
     implementation(Libs.rxJava)
+    implementation(Libs.coroutinesCore)
+    implementation(Libs.coroutinesAndroid)
     implementation(Libs.glide)
     kapt(Libs.glideCompiler)
 

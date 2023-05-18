@@ -35,6 +35,8 @@ dependencies {
     implementation(Libs.glide)
     annotationProcessor(Libs.glideCompiler)
 
+    implementation(Libs.coroutinesCore)
+
     implementation(project(":core:network"))
     implementation(project(":core:mvvm"))
     implementation(project(":core:ext"))

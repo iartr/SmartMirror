@@ -11,4 +11,10 @@ internal interface NewsApi {
         @Query("q") query: String,
         @Query("apiKey") apiKey: String = BuildConfig.API_KEY_NEWS
     ): Single<GetEverythingResponse>
+
+    @GET("everything")
+    fun getEverything2(
+        @Query("q") query: String,
+        @Query("apiKey") apiKey: String = BuildConfig.API_KEY_NEWS
+    ): Unit
 }

@@ -1,7 +1,7 @@
 package com.iartr.smartmirror.account
 
 import android.content.Intent
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.Flow
 
 interface IAccountRepository {
     fun addAuthStateListener(listener: AuthStateListener)
@@ -18,7 +18,7 @@ interface IAccountRepository {
 
     interface Google {
         fun getIntentForAuth(): Intent?
-        fun auth(data: Intent?): Single<Boolean>
+        fun auth(data: Intent?): Flow<Unit>
     }
 }
 

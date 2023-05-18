@@ -28,5 +28,7 @@ dependencies {
     implementation(Libs.androidAppCompat)
     implementation(Libs.javaxInject)
     implementation(Libs.rxJava)
+    implementation(Libs.coroutinesCore)
+    implementation(Libs.coroutinesAndroid)
     testImplementation(LibsTest.junit4)
 }

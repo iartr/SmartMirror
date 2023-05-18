@@ -29,5 +29,7 @@ dependencies {
     implementation(Libs.androidKtx)
     implementation(Libs.androidAppCompat)
     implementation(Libs.rxJava)
+    implementation(Libs.coroutinesCore)
+    implementation(Libs.coroutinesAndroid)
     testImplementation(LibsTest.junit4)
 }

@@ -28,4 +28,6 @@ android {
 dependencies {
     implementation(Libs.androidKtx)
     implementation(Libs.rxJava)
+    implementation(Libs.coroutinesCore)
+    implementation(Libs.coroutinesAndroid)
 }

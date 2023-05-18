@@ -15,7 +15,9 @@ import com.iartr.smartmirror.account.IAccountRepository
 import com.iartr.smartmirror.core.utils.AppContextHolder
 import com.iartr.smartmirror.R
 import com.iartr.smartmirror.core.utils.dagger.AppScope
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
@@ -68,16 +70,18 @@ class AccountRepository @Inject constructor(
             return GoogleSignIn.getClient(AppContextHolder.context, googleSignInOptions).signInIntent
         }
 
-        override fun auth(data: Intent?): Single<Boolean> {
-            return Single.create { emitter ->
+        override fun auth(data: Intent?): Flow<Unit> {
+            return callbackFlow {
                 GoogleSignIn.getSignedInAccountFromIntent(data)
                     .addOnSuccessListener { googleAccount ->
                         val googleCredentials = GoogleAuthProvider.getCredential(googleAccount.idToken, null)
                         Firebase.auth.signInWithCredential(googleCredentials)
-                            .addOnSuccessListener { emitter.onSuccess(true) }
-                            .addOnFailureListener(emitter::tryOnError)
+                            .addOnSuccessListener { trySend(Unit); close() }
+                            .addOnFailureListener { close(it) }
                     }
-                    .addOnFailureListener(emitter::tryOnError)
+                    .addOnFailureListener { close(it) }
+
+                awaitClose()
             }
         }
     }

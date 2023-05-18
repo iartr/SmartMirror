@@ -42,6 +42,8 @@ android {
 dependencies {
     implementation(Libs.gson)
     implementation(Libs.rxJava)
+    implementation(Libs.coroutinesCore)
+    implementation(Libs.coroutinesAndroid)
 
     implementation(project(":core:network"))
 

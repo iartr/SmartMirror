@@ -48,6 +48,9 @@ dependencies {
     implementation(Libs.cameraXView)
     implementation(project(":camera"))
 
+    implementation(Libs.coroutinesCore)
+    implementation(Libs.coroutinesAndroid)
+
     implementation(project(":features:news:api"))
     compileOnly(project(":features:news:impl"))
     implementation(project(":features:settings:api"))
