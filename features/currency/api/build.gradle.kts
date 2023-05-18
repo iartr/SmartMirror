@@ -13,7 +13,6 @@ android {
 
     defaultConfig {
         minSdk = DefaultConfig.minSdk
-        targetSdk = DefaultConfig.targetSdk
 
         testInstrumentationRunner = LibsTest.testInstrumentationRunner
     }
@@ -41,7 +40,6 @@ android {
 
 dependencies {
     implementation(Libs.gson)
-    implementation(Libs.rxJava)
     implementation(Libs.coroutinesCore)
     implementation(Libs.coroutinesAndroid)
 

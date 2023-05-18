@@ -1,7 +1,7 @@
 package com.iartr.smartmirror.currency
 
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.Flow
 
 interface ICurrencyRepository {
-    fun getCurrencyExchangeRub(): Single<ExchangeRates>
+    fun getCurrencyExchangeRub(): Flow<ExchangeRates>
 }

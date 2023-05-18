@@ -41,8 +41,8 @@ class MirrorViewModel(
     private val weatherStateMutable = MutableStateFlow<WeatherState>(WeatherState.Loading)
     val weatherState: StateFlow<WeatherState> = weatherStateMutable.asStateFlow()
 
-    private val currencyStateMutable = BehaviorSubject.createDefault<CurrencyState>(CurrencyState.Loading)
-    val currencyState: Observable<CurrencyState> = currencyStateMutable.distinctUntilChanged()
+    private val currencyStateMutable = MutableStateFlow<CurrencyState>(CurrencyState.Loading)
+    val currencyState: StateFlow<CurrencyState> = currencyStateMutable.asStateFlow()
 
     private val articlesStateMutable = BehaviorSubject.createDefault<ArticlesState>(ArticlesState.Loading)
     val articlesState: Observable<ArticlesState> = articlesStateMutable.distinctUntilChanged()
@@ -85,19 +85,20 @@ class MirrorViewModel(
     }
 
     fun loadCurrency() {
-        togglesRepository.isEnabled(TogglesSet.CURRENCY)
-            .zipWith(currencyRepository.getCurrencyExchangeRub(), { t1, t2 -> t1 to t2 })
-            .doOnSubscribe { currencyStateMutable.onNext(CurrencyState.Loading) }
-            .doOnError { currencyStateMutable.onNext(CurrencyState.Error) }
-            .subscribeSuccess { (isActive, exchangeRate) ->
+        togglesRepository.isEnabled2(TogglesSet.CURRENCY)
+            .zip(currencyRepository.getCurrencyExchangeRub(), { t1, t2 -> t1 to t2 })
+            .catch { currencyStateMutable.emit(CurrencyState.Error) }
+            .onStart { currencyStateMutable.emit(CurrencyState.Error) }
+            .onEach { (isActive, exchangeRate) ->
                 if (!isActive) {
-                    currencyStateMutable.onNext(CurrencyState.Disabled)
-                    return@subscribeSuccess
+                    currencyStateMutable.emit(CurrencyState.Disabled)
+                    return@onEach
                 }
 
-                currencyStateMutable.onNext(CurrencyState.Success(exchangeRate))
+                currencyStateMutable.emit(CurrencyState.Success(exchangeRate))
             }
-            .addTo(disposables)
+            .flowOn(Dispatchers.IO)
+            .launchIn(viewModelScope)
     }
 
     fun loadArticles() {

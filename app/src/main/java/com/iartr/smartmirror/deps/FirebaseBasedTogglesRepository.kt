@@ -55,7 +55,8 @@ class FirebaseBasedTogglesRepository @Inject constructor(
             fbUserDatabase().child(toggle.asString).get()
                 .addOnSuccessListener {
                     val dbValue = it.getValue<Boolean>() ?: toggle.defaultEnabled
-                    trySendBlocking(remoteConfigValue && preferenceValue && dbValue)
+                    trySend(remoteConfigValue && preferenceValue && dbValue)
+                    close()
                 }
                 .addOnFailureListener { close(it) }
 
