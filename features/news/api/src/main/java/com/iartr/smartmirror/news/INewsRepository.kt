@@ -1,7 +1,7 @@
 package com.iartr.smartmirror.news
 
-import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.Flow
 
 interface INewsRepository {
-    fun getLatest(): Single<List<News>>
+    fun getLatest(): Flow<List<News>>
 }

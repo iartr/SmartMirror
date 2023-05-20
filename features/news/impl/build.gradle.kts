@@ -13,7 +13,6 @@ android {
 
     defaultConfig {
         minSdk = DefaultConfig.minSdk
-        targetSdk = DefaultConfig.targetSdk
 
         val apikey = gradleLocalProperties(rootDir).getProperty("apikey.news")
         buildConfigField(type = "String", name = "API_KEY_NEWS", value = "\"$apikey\"")
@@ -41,7 +40,6 @@ dependencies {
     implementation(Libs.androidMaterial)
     implementation(Libs.retrofit)
     implementation(Libs.gson)
-    implementation(Libs.rxJava)
     implementation(Libs.glide)
     kapt(Libs.glideCompiler)
 
@@ -49,7 +47,6 @@ dependencies {
     kapt(Libs.dagger2Compiler)
 
     implementation(Libs.coroutinesCore)
-    implementation(Libs.coroutinesAndroid)
 
     implementation(project(":features:news:api"))
 

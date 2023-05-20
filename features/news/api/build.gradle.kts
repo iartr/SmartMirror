@@ -31,7 +31,6 @@ dependencies {
     implementation(Libs.androidMaterial)
     implementation(Libs.retrofit)
     implementation(Libs.gson)
-    implementation(Libs.rxJava)
     implementation(Libs.glide)
     annotationProcessor(Libs.glideCompiler)
 

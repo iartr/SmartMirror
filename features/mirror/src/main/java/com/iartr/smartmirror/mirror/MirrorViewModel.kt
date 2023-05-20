@@ -44,8 +44,8 @@ class MirrorViewModel(
     private val currencyStateMutable = MutableStateFlow<CurrencyState>(CurrencyState.Loading)
     val currencyState: StateFlow<CurrencyState> = currencyStateMutable.asStateFlow()
 
-    private val articlesStateMutable = BehaviorSubject.createDefault<ArticlesState>(ArticlesState.Loading)
-    val articlesState: Observable<ArticlesState> = articlesStateMutable.distinctUntilChanged()
+    private val articlesStateMutable = MutableStateFlow<ArticlesState>(ArticlesState.Loading)
+    val articlesState: StateFlow<ArticlesState> = articlesStateMutable.asStateFlow()
 
     private val cameraStateMutable = BehaviorSubject.createDefault<CameraState>(CameraState.Hide)
     val cameraState: Observable<CameraState> = cameraStateMutable.distinctUntilChanged()
@@ -102,19 +102,20 @@ class MirrorViewModel(
     }
 
     fun loadArticles() {
-        togglesRepository.isEnabled(TogglesSet.ARTICLES)
-            .zipWith(articlesRepository.getLatest(), { t1, t2 -> t1 to t2 })
-            .doOnSubscribe { articlesStateMutable.onNext(ArticlesState.Loading) }
-            .doOnError { articlesStateMutable.onNext(ArticlesState.Error) }
-            .subscribeSuccess { (isActive, articles) ->
+        togglesRepository.isEnabled2(TogglesSet.ARTICLES)
+            .zip(articlesRepository.getLatest(), { t1, t2 -> t1 to t2 })
+            .catch { articlesStateMutable.emit(ArticlesState.Error) }
+            .onStart { articlesStateMutable.emit(ArticlesState.Loading) }
+            .onEach { (isActive, articles) ->
                 if (!isActive) {
-                    articlesStateMutable.onNext(ArticlesState.Disabled)
-                    return@subscribeSuccess
+                    articlesStateMutable.emit(ArticlesState.Disabled)
+                    return@onEach
                 }
 
-                articlesStateMutable.onNext(ArticlesState.Success(articles))
+                articlesStateMutable.emit(ArticlesState.Success(articles))
             }
-            .addTo(disposables)
+            .flowOn(Dispatchers.IO)
+            .launchIn(viewModelScope)
     }
 
     fun loadCameraState() {

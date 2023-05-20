@@ -26,7 +26,6 @@ import com.iartr.smartmirror.mirror.di.MirrorFeatureViewModel
 import com.iartr.smartmirror.mvvm.BaseFragment
 import com.iartr.smartmirror.news.News
 import dagger.Lazy
-import kotlinx.coroutines.flow.catch
 import javax.inject.Inject
 
 class MirrorFragment : BaseFragment(R.layout.fragment_mirror) {
@@ -113,14 +112,12 @@ class MirrorFragment : BaseFragment(R.layout.fragment_mirror) {
         }
 
         viewModel.isAccountVisible.subscribeWithFragment { accountButton.isVisible = it }
-        viewModel.articlesState.subscribeWithFragment(::applyArticlesState)
         viewModel.cameraState.subscribeWithFragment(::applyCameraState)
         viewModel.googleAuthSignal.subscribeWithFragment { onGoogleAuthSignalReceive() }
 
         lifecycleScope.launchWhenResumed { viewModel.weatherState.collect(::applyWeatherState) }
-        lifecycleScope.launchWhenResumed {
-            viewModel.currencyState.collect(::applyCurrencyState)
-        }
+        lifecycleScope.launchWhenResumed { viewModel.currencyState.collect(::applyCurrencyState) }
+        lifecycleScope.launchWhenResumed { viewModel.articlesState.collect(::applyArticlesState) }
     }
 
     override fun onDestroyView() {
