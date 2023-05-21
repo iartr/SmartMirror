@@ -11,7 +11,6 @@ android {
 
     defaultConfig {
         minSdk = DefaultConfig.minSdk
-        targetSdk = DefaultConfig.targetSdk
 
         testInstrumentationRunner = LibsTest.testInstrumentationRunner
     }
@@ -38,7 +37,6 @@ dependencies {
     implementation(Libs.androidFragment)
     implementation(Libs.retrofit)
     implementation(Libs.gson)
-    implementation(Libs.rxJava)
     implementation(Libs.glide)
     kapt(Libs.glideCompiler)
 
@@ -49,7 +47,6 @@ dependencies {
     implementation(project(":camera"))
 
     implementation(Libs.coroutinesCore)
-    implementation(Libs.coroutinesAndroid)
 
     implementation(project(":features:news:api"))
     compileOnly(project(":features:news:impl"))

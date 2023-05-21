@@ -11,8 +11,6 @@ android {
 
     defaultConfig {
         minSdk = DefaultConfig.minSdk
-        targetSdk = DefaultConfig.targetSdk
-
         testInstrumentationRunner = LibsTest.testInstrumentationRunner
     }
 
@@ -36,11 +34,7 @@ dependencies {
     implementation(Libs.androidActivity)
     implementation(Libs.androidFragment)
     implementation(Libs.androidMaterial)
-    implementation(Libs.lifecycleRuntime)
-    implementation(Libs.lifecycleViewModel)
-    implementation(Libs.rxJava)
     implementation(Libs.coroutinesCore)
-    implementation(Libs.coroutinesAndroid)
     implementation(Libs.glide)
     kapt(Libs.glideCompiler)
 

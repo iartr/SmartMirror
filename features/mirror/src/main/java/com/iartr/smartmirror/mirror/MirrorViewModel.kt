@@ -6,18 +6,16 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.iartr.smartmirror.account.IAccountRepository
 import com.iartr.smartmirror.currency.ICurrencyRepository
-import com.iartr.smartmirror.ext.subscribeSuccess
 import com.iartr.smartmirror.mvvm.BaseViewModel
 import com.iartr.smartmirror.news.News
 import com.iartr.smartmirror.news.INewsRepository
 import com.iartr.smartmirror.toggles.ITogglesRepository
 import com.iartr.smartmirror.toggles.TogglesSet
-import com.iartr.smartmirror.core.utils.ConsumableStream
 import com.iartr.smartmirror.currency.ExchangeRates
 import com.iartr.smartmirror.weather.IWeatherRepository
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,6 +25,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.zip
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MirrorViewModel(
@@ -47,14 +46,14 @@ class MirrorViewModel(
     private val articlesStateMutable = MutableStateFlow<ArticlesState>(ArticlesState.Loading)
     val articlesState: StateFlow<ArticlesState> = articlesStateMutable.asStateFlow()
 
-    private val cameraStateMutable = BehaviorSubject.createDefault<CameraState>(CameraState.Hide)
-    val cameraState: Observable<CameraState> = cameraStateMutable.distinctUntilChanged()
+    private val cameraStateMutable = MutableStateFlow<CameraState>(CameraState.Hide)
+    val cameraState: StateFlow<CameraState> = cameraStateMutable.asStateFlow()
 
-    private val isAccountVisibleMutable = BehaviorSubject.createDefault(true)
-    val isAccountVisible: Observable<Boolean> = isAccountVisibleMutable.distinctUntilChanged()
+    private val isAccountVisibleMutable = MutableStateFlow(false)
+    val isAccountVisible: StateFlow<Boolean> = isAccountVisibleMutable.asStateFlow()
 
-    private val googleAuthSignalMutable = ConsumableStream<Unit>()
-    val googleAuthSignal: Observable<Unit> = googleAuthSignalMutable.observe()
+    private val googleAuthSignalMutable = MutableSharedFlow<Unit>(replay = 0)
+    val googleAuthSignal: Flow<Unit> = googleAuthSignalMutable
 
     fun loadAll() {
         loadWeather()
@@ -65,7 +64,7 @@ class MirrorViewModel(
     }
 
     fun loadWeather() {
-        togglesRepository.isEnabled2(TogglesSet.WEATHER)
+        togglesRepository.isEnabled(TogglesSet.WEATHER)
             .zip(weatherRepository.getCurrentWeather(), { t1, t2 -> t1 to t2 })
             .catch { weatherStateMutable.emit(WeatherState.Error) }
             .onStart { weatherStateMutable.emit(WeatherState.Loading) }
@@ -85,7 +84,7 @@ class MirrorViewModel(
     }
 
     fun loadCurrency() {
-        togglesRepository.isEnabled2(TogglesSet.CURRENCY)
+        togglesRepository.isEnabled(TogglesSet.CURRENCY)
             .zip(currencyRepository.getCurrencyExchangeRub(), { t1, t2 -> t1 to t2 })
             .catch { currencyStateMutable.emit(CurrencyState.Error) }
             .onStart { currencyStateMutable.emit(CurrencyState.Error) }
@@ -102,7 +101,7 @@ class MirrorViewModel(
     }
 
     fun loadArticles() {
-        togglesRepository.isEnabled2(TogglesSet.ARTICLES)
+        togglesRepository.isEnabled(TogglesSet.ARTICLES)
             .zip(articlesRepository.getLatest(), { t1, t2 -> t1 to t2 })
             .catch { articlesStateMutable.emit(ArticlesState.Error) }
             .onStart { articlesStateMutable.emit(ArticlesState.Loading) }
@@ -118,18 +117,16 @@ class MirrorViewModel(
             .launchIn(viewModelScope)
     }
 
-    fun loadCameraState() {
+    private fun loadCameraState() {
         togglesRepository.isEnabled(TogglesSet.CAMERA)
-            .subscribeSuccess { isActive ->
-                cameraStateMutable.onNext(if (isActive) CameraState.Visible else CameraState.Hide)
-            }
-            .addTo(disposables)
+            .onEach { isActive -> cameraStateMutable.emit(if (isActive) CameraState.Visible else CameraState.Hide) }
+            .launchIn(viewModelScope)
     }
 
-    fun loadAccountState() {
+    private fun loadAccountState() {
         togglesRepository.isEnabled(TogglesSet.ACCOUNT)
-            .subscribeSuccess { isAccountVisibleMutable.onNext(it) }
-            .addTo(disposables)
+            .onEach(isAccountVisibleMutable::emit)
+            .launchIn(viewModelScope)
     }
 
     fun onAccountButtonClick() {
@@ -137,7 +134,7 @@ class MirrorViewModel(
             router.openAccount()
             return
         }
-        googleAuthSignalMutable.push(Unit)
+        viewModelScope.launch { googleAuthSignalMutable.emit(Unit) }
     }
 
     fun onGoogleAuthResult(data: Intent?) {

@@ -10,7 +10,6 @@ android {
 
     defaultConfig {
         minSdk = DefaultConfig.minSdk
-        targetSdk = DefaultConfig.targetSdk
 
         testInstrumentationRunner = LibsTest.testInstrumentationRunner
     }
@@ -28,8 +27,6 @@ android {
 dependencies {
     implementation(Libs.androidKtx)
     implementation(Libs.androidAppCompat)
-    implementation(Libs.rxJava)
     implementation(Libs.coroutinesCore)
-    implementation(Libs.coroutinesAndroid)
     testImplementation(LibsTest.junit4)
 }

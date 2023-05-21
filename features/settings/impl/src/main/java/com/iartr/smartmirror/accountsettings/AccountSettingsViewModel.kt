@@ -4,17 +4,23 @@ package com.iartr.smartmirror.accountsettings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.iartr.smartmirror.account.Account
 import com.iartr.smartmirror.account.AuthStateListener
 import com.iartr.smartmirror.account.IAccountRepository
-import com.iartr.smartmirror.accountsettings.impl.R
-import com.iartr.smartmirror.ext.subscribeSuccess
 import com.iartr.smartmirror.mvvm.BaseViewModel
 import com.iartr.smartmirror.toggles.ITogglesRepository
 import com.iartr.smartmirror.toggles.TogglesSet
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.subjects.BehaviorSubject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.zip
 import javax.inject.Inject
 
 class AccountSettingsViewModel(
@@ -32,8 +38,8 @@ class AccountSettingsViewModel(
         router.back()
     }
 
-    private val viewStateMutable: BehaviorSubject<State> = BehaviorSubject.createDefault(State.Loading)
-    val viewState: Observable<State> = viewStateMutable.distinctUntilChanged()
+    private val viewStateMutable = MutableStateFlow<State>(State.Loading)
+    val viewState: StateFlow<State> = viewStateMutable.asStateFlow()
 
     private var content: State.Content = State.Content(
         accountInfo = Account(
@@ -55,7 +61,7 @@ class AccountSettingsViewModel(
         set(value) {
             val withAccountInfo = accountRepository.getAccountInfo()?.let { value.copy(accountInfo = it) } ?: value
             field = withAccountInfo
-            viewStateMutable.onNext(withAccountInfo)
+            viewStateMutable.tryEmit(withAccountInfo)
         }
 
     init {
@@ -69,19 +75,22 @@ class AccountSettingsViewModel(
     }
 
     fun loadFeatures() {
-        val cameraSource = togglesRepository.isEnabled(TogglesSet.CAMERA)
-        val adsSource = togglesRepository.isEnabled(TogglesSet.ADS)
-        val articlesSource = togglesRepository.isEnabled(TogglesSet.ARTICLES)
-        val currencySource = togglesRepository.isEnabled(TogglesSet.CURRENCY)
-        val weatherSource = togglesRepository.isEnabled(TogglesSet.WEATHER)
-        Single.zip(cameraSource, adsSource, articlesSource, currencySource, weatherSource) { camera, ads, articles, currency, weather ->
-            State.Features(camera, ads, articles, currency, weather)
-        }
-            .doOnSubscribe { viewStateMutable.onNext(State.Loading) }
+        val cameraSource2 = togglesRepository.isEnabled(TogglesSet.CAMERA)
+        val adsSource2 = togglesRepository.isEnabled(TogglesSet.ADS)
+        val articlesSource2 = togglesRepository.isEnabled(TogglesSet.ARTICLES)
+        val currencySource2 = togglesRepository.isEnabled(TogglesSet.CURRENCY)
+        val weatherSource2 = togglesRepository.isEnabled(TogglesSet.WEATHER)
+
+        cameraSource2.zip(adsSource2, { t1, t2 -> State.Features(t1, t2, false, false, false) })
+            .zip(articlesSource2, { state, v -> state.copy(isArticlesEnabled = v) })
+            .zip(currencySource2, { state, v -> state.copy(isCurrencyEnabled = v) })
+            .zip(weatherSource2, { state, v -> state.copy(isWeatherEnabled = v) })
+            .onStart { viewStateMutable.emit(State.Loading) }
+            .flowOn(Dispatchers.IO)
             .withErrorDisplay()
-            .doOnError { viewStateMutable.onNext(State.Error) }
-            .subscribeSuccess { content = content.copy(features = it) }
-            .addTo(disposables)
+            .catch { viewStateMutable.emit(State.Error) }
+            .onEach { content = content.copy(features = it) }
+            .launchIn(viewModelScope)
     }
 
     fun onBack() = router.back()
@@ -94,50 +103,50 @@ class AccountSettingsViewModel(
         togglesRepository.setEnabled(TogglesSet.CAMERA, checked)
             .withProgressDialog()
             .withErrorDisplay()
-            .subscribeSuccess {
+            .onEach {
                 content = content.copy(features = content.features.copy(isCameraEnabled = checked))
             }
-            .addTo(disposables)
+            .launchIn(viewModelScope)
     }
 
     fun onAdsChecked(checked: Boolean) {
         togglesRepository.setEnabled(TogglesSet.ADS, checked)
             .withProgressDialog()
             .withErrorDisplay()
-            .subscribeSuccess {
+            .onEach {
                 content = content.copy(features = content.features.copy(isAdsEnabled = checked))
             }
-            .addTo(disposables)
+            .launchIn(viewModelScope)
     }
 
     fun onArticlesChecked(checked: Boolean) {
         togglesRepository.setEnabled(TogglesSet.ARTICLES, checked)
             .withProgressDialog()
             .withErrorDisplay()
-            .subscribeSuccess {
+            .onEach {
                 content = content.copy(features = content.features.copy(isArticlesEnabled = checked))
             }
-            .addTo(disposables)
+            .launchIn(viewModelScope)
     }
 
     fun onCurrencyChecked(checked: Boolean) {
         togglesRepository.setEnabled(TogglesSet.CURRENCY, checked)
             .withProgressDialog()
             .withErrorDisplay()
-            .subscribeSuccess {
+            .onEach {
                 content = content.copy(features = content.features.copy(isCurrencyEnabled = checked))
             }
-            .addTo(disposables)
+            .launchIn(viewModelScope)
     }
 
     fun onWeatherChecked(checked: Boolean) {
         togglesRepository.setEnabled(TogglesSet.WEATHER, checked)
             .withProgressDialog()
             .withErrorDisplay()
-            .subscribeSuccess {
+            .onEach {
                 content = content.copy(features = content.features.copy(isWeatherEnabled = checked))
             }
-            .addTo(disposables)
+            .launchIn(viewModelScope)
     }
 
     sealed interface State {

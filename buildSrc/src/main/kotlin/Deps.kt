@@ -53,7 +53,6 @@ object Libs {
     val lifecycleViewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.LIFECYCLE_VERSION}"
     val lifecycleViewModelSaveState = "androidx.lifecycle:lifecycle-viewmodel-savedstate:${Versions.LIFECYCLE_VERSION}"
     val lifecycleLiveData = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.LIFECYCLE_VERSION}"
-    val lifecycleRx = "androidx.lifecycle:lifecycle-reactivestreams-ktx:${Versions.LIFECYCLE_VERSION}"
     //endregion
 
     //region Firebase
@@ -72,15 +71,6 @@ object Libs {
     val googleAds = "com.google.android.gms:play-services-ads:${Versions.GOOGLE_ADS_VERSION}"
     //endregion
 
-    //region RxJava
-    // https://github.com/ReactiveX/RxJava
-    val rxJava = "io.reactivex.rxjava3:rxjava:${Versions.RX_JAVA}"
-    // https://github.com/ReactiveX/RxKotlin
-    val rxKotlin = "io.reactivex.rxjava3:rxkotlin:${Versions.RX_KOTLIN}"
-    // https://github.com/ReactiveX/RxAndroid
-    val rxAndroid = "io.reactivex.rxjava3:rxandroid:${Versions.RX_ANDROID}"
-    //endregion
-
     //region Network
     // https://square.github.io/okhttp
     val okHttp = "com.squareup.okhttp3:okhttp-bom:${Versions.OKHTTP_VERSION}"
@@ -89,7 +79,6 @@ object Libs {
 
     // https://github.com/square/retrofit
     val retrofit = "com.squareup.retrofit2:retrofit:${Versions.RETROFIT_VERSION}"
-    val retrofitRxSupport = "com.squareup.retrofit2:adapter-rxjava3:${Versions.RETROFIT_VERSION}"
     val retrofitJsonReader = "com.squareup.retrofit2:converter-gson:${Versions.RETROFIT_VERSION}"
     val retrofitScalars = "com.squareup.retrofit2:converter-scalars:${Versions.RETROFIT_VERSION}"
 
@@ -154,10 +143,6 @@ object Versions {
     const val PLAY_SERVICES_PLUGIN_VERSION = "4.3.12"
     const val PLAY_SERVICES_VERSION = "20.1.0"
     const val GOOGLE_ADS_VERSION = "20.5.0"
-
-    const val RX_JAVA = "3.1.3"
-    const val RX_KOTLIN = "3.0.1"
-    const val RX_ANDROID = "3.0.0"
 
     const val OKHTTP_VERSION = "4.10.0"
     const val RETROFIT_VERSION = "2.9.0"

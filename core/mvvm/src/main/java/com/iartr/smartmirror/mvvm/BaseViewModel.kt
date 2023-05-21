@@ -1,55 +1,32 @@
 package com.iartr.smartmirror.mvvm
 
+import androidx.annotation.CallSuper
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.subjects.BehaviorSubject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 
 open class BaseViewModel(
     open val router: BaseRouter = BaseRouter()
 ) : ViewModel() {
-    protected val disposables = CompositeDisposable()
+    private val isProgressDialogVisibleMutable = MutableStateFlow(false)
+    val isProgressDialogVisible: Flow<Boolean> = isProgressDialogVisibleMutable.asStateFlow()
 
-    private val isProgressDialogVisibleMutable: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
-    val isProgressDialogVisible: Observable<Boolean> = isProgressDialogVisibleMutable.distinctUntilChanged()
-
+    @CallSuper
     override fun onCleared() {
         super.onCleared()
-        disposables.dispose()
     }
 
-    protected fun Disposable.addTo(compositeDisposable: CompositeDisposable) {
-        compositeDisposable.add(this)
+    protected fun <T : Any> Flow<T>.withProgressDialog(): Flow<T> {
+        return onStart { isProgressDialogVisibleMutable.emit(true) }
+            .onCompletion { isProgressDialogVisibleMutable.emit(false) }
     }
 
-    protected fun <T : Any> Single<T>.withProgressDialog(): Single<T> {
-        return doOnSubscribe { isProgressDialogVisibleMutable.onNext(true) }
-            .doFinally { isProgressDialogVisibleMutable.onNext(false) }
-    }
-
-    protected fun <T : Any> Observable<T>.withProgressDialog(): Observable<T> {
-        return doOnSubscribe { isProgressDialogVisibleMutable.onNext(true) }
-            .doFinally { isProgressDialogVisibleMutable.onNext(false) }
-    }
-
-    protected fun Completable.withProgressDialog(): Completable {
-        return doOnSubscribe { isProgressDialogVisibleMutable.onNext(true) }
-            .doFinally { isProgressDialogVisibleMutable.onNext(false) }
-    }
-
-    protected fun <T : Any> Single<T>.withErrorDisplay(@StringRes stringRes: Int = com.iartr.smartmirror.design.R.string.common_network_error): Single<T> {
-        return doOnError { router.showToast(stringRes) }
-    }
-
-    protected fun <T : Any> Observable<T>.withErrorDisplay(@StringRes stringRes: Int = com.iartr.smartmirror.design.R.string.common_network_error): Observable<T> {
-        return doOnError { router.showToast(stringRes) }
-    }
-
-    protected fun Completable.withErrorDisplay(@StringRes stringRes: Int = com.iartr.smartmirror.design.R.string.common_network_error): Completable {
-        return doOnError { router.showToast(stringRes) }
+    protected fun <T : Any> Flow<T>.withErrorDisplay(@StringRes stringRes: Int = com.iartr.smartmirror.design.R.string.common_network_error): Flow<T> {
+        return catch { router.showToast(stringRes) }
     }
 }

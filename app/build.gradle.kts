@@ -95,14 +95,9 @@ dependencies {
     implementation(Libs.lifecycleViewModel)
     implementation(Libs.lifecycleViewModelSaveState)
     implementation(Libs.lifecycleLiveData)
-    implementation(Libs.lifecycleRx)
 
     implementation(Libs.playServices)
     implementation(Libs.googleAds)
-
-    implementation(Libs.rxJava)
-    implementation(Libs.rxKotlin)
-    implementation(Libs.rxAndroid)
 
     implementation(Libs.coroutinesCore)
     implementation(Libs.coroutinesAndroid)
@@ -111,7 +106,6 @@ dependencies {
     implementation(Libs.okHttpLogger)
     implementation(Libs.okHttpMockWebServer)
     implementation(Libs.retrofit)
-    implementation(Libs.retrofitRxSupport)
     implementation(Libs.retrofitJsonReader)
     implementation(Libs.retrofitScalars)
     implementation(Libs.gson)

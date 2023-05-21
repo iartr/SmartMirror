@@ -111,13 +111,12 @@ class MirrorFragment : BaseFragment(R.layout.fragment_mirror) {
             setupCamera()
         }
 
-        viewModel.isAccountVisible.subscribeWithFragment { accountButton.isVisible = it }
-        viewModel.cameraState.subscribeWithFragment(::applyCameraState)
-        viewModel.googleAuthSignal.subscribeWithFragment { onGoogleAuthSignalReceive() }
-
         lifecycleScope.launchWhenResumed { viewModel.weatherState.collect(::applyWeatherState) }
+        lifecycleScope.launchWhenResumed { viewModel.cameraState.collect(::applyCameraState) }
         lifecycleScope.launchWhenResumed { viewModel.currencyState.collect(::applyCurrencyState) }
         lifecycleScope.launchWhenResumed { viewModel.articlesState.collect(::applyArticlesState) }
+        lifecycleScope.launchWhenResumed { viewModel.isAccountVisible.collect { accountButton.isVisible = it } }
+        lifecycleScope.launchWhenResumed { viewModel.googleAuthSignal.collect { onGoogleAuthSignalReceive() } }
     }
 
     override fun onDestroyView() {

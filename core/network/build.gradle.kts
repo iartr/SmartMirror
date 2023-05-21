@@ -10,7 +10,6 @@ android {
 
     defaultConfig {
         minSdk = DefaultConfig.minSdk
-        targetSdk = DefaultConfig.targetSdk
     }
 
     compileOptions {
@@ -28,7 +27,6 @@ dependencies {
     implementation(Libs.okHttpLogger)
     implementation(Libs.gson)
     implementation(Libs.retrofit)
-    implementation(Libs.retrofitRxSupport)
     implementation(Libs.retrofitJsonReader)
     implementation(Libs.retrofitScalars)
     testImplementation(LibsTest.junit4)

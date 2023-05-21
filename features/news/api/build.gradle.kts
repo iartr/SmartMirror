@@ -11,7 +11,6 @@ android {
 
     defaultConfig {
         minSdk = DefaultConfig.minSdk
-        targetSdk = DefaultConfig.targetSdk
         testInstrumentationRunner = LibsTest.testInstrumentationRunner
     }
 

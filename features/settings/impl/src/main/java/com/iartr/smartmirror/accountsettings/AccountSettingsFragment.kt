@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.material.color.MaterialColors
 import com.iartr.smartmirror.accountsettings.di.accountSettingsFeatureComponentProvider
@@ -104,45 +105,47 @@ class AccountSettingsFragment : BaseFragment(R.layout.fragment_account) {
             setOnClickListener { viewModel.onLogoutClicked() }
         }
 
-        viewModel.viewState.subscribeWithFragment { state ->
-            when (state) {
-                is AccountSettingsViewModel.State.Content -> {
-                    contentRoot.isInvisible = false
-                    progressBar.isVisible = false
-                    errorView.hide()
+        lifecycleScope.launchWhenResumed {
+            viewModel.viewState.collect { state ->
+                when (state) {
+                    is AccountSettingsViewModel.State.Content -> {
+                        contentRoot.isInvisible = false
+                        progressBar.isVisible = false
+                        errorView.hide()
 
-                    Glide.with(this)
-                        .load(state.accountInfo.photoUrl)
-                        .placeholder(errorAccountDrawable)
-                        .fallback(errorAccountDrawable)
-                        .error(errorAccountDrawable)
-                        .into(photoIv)
+                        Glide.with(this@AccountSettingsFragment)
+                            .load(state.accountInfo.photoUrl)
+                            .placeholder(errorAccountDrawable)
+                            .fallback(errorAccountDrawable)
+                            .error(errorAccountDrawable)
+                            .into(photoIv)
 
-                    uidTv.text = state.accountInfo.uid
-                    displayNameTv.isVisible = state.accountInfo.displayName != null
-                    displayNameTv.text = state.accountInfo.displayName
-                    phoneTv.isVisible = state.accountInfo.phone != null
-                    phoneTv.text = state.accountInfo.phone
-                    emailTv.isVisible = state.accountInfo.email != null
-                    emailTv.text = state.accountInfo.email
-                    isEmailVerifiedTv.isVisible = state.accountInfo.email != null
-                    isEmailVerifiedTv.text = state.accountInfo.isEmailVerified.toString()
+                        uidTv.text = state.accountInfo.uid
+                        displayNameTv.isVisible = state.accountInfo.displayName != null
+                        displayNameTv.text = state.accountInfo.displayName
+                        phoneTv.isVisible = state.accountInfo.phone != null
+                        phoneTv.text = state.accountInfo.phone
+                        emailTv.isVisible = state.accountInfo.email != null
+                        emailTv.text = state.accountInfo.email
+                        isEmailVerifiedTv.isVisible = state.accountInfo.email != null
+                        isEmailVerifiedTv.text = state.accountInfo.isEmailVerified.toString()
 
-                    cameraCheckBox.isChecked = state.features.isCameraEnabled
-                    adsCheckBox.isChecked = state.features.isAdsEnabled
-                    articlesCheckBox.isChecked = state.features.isArticlesEnabled
-                    weatherCheckBox.isChecked = state.features.isWeatherEnabled
-                    currencyCheckBox.isChecked = state.features.isCurrencyEnabled
-                }
-                is AccountSettingsViewModel.State.Error -> {
-                    contentRoot.isInvisible = true
-                    progressBar.isVisible = false
-                    errorView.show(retryAction = { viewModel.loadFeatures() })
-                }
-                is AccountSettingsViewModel.State.Loading -> {
-                    contentRoot.isInvisible = true
-                    progressBar.isVisible = true
-                    errorView.hide()
+                        cameraCheckBox.isChecked = state.features.isCameraEnabled
+                        adsCheckBox.isChecked = state.features.isAdsEnabled
+                        articlesCheckBox.isChecked = state.features.isArticlesEnabled
+                        weatherCheckBox.isChecked = state.features.isWeatherEnabled
+                        currencyCheckBox.isChecked = state.features.isCurrencyEnabled
+                    }
+                    is AccountSettingsViewModel.State.Error -> {
+                        contentRoot.isInvisible = true
+                        progressBar.isVisible = false
+                        errorView.show(retryAction = { viewModel.loadFeatures() })
+                    }
+                    is AccountSettingsViewModel.State.Loading -> {
+                        contentRoot.isInvisible = true
+                        progressBar.isVisible = true
+                        errorView.hide()
+                    }
                 }
             }
         }
